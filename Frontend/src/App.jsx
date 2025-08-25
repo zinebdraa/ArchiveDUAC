@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
+import Login from "./Account/Login";
+import SideBar from "./components/SideBar";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -12,10 +14,12 @@ function App() {
 
   return (
     <>
-      <div className="bg-black bold text-red-500 ">
+      {/* <div className="bg-black bold text-red-500 ">
         <h1>Electron + React + Vite</h1>
         <p>IPC test: {pong}</p>
-      </div>
+      </div> */}
+      {/* <Login/> */}
+      <SideBar/>
     </>
   );
 }
