@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import Login from "./Account/Login";
 import SideBar from "./components/SideBar";
+import NavBare from "./components/NavBare";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -19,7 +20,8 @@ function App() {
         <p>IPC test: {pong}</p>
       </div> */}
       {/* <Login/> */}
-      <SideBar/>
+      {/* <SideBar/> */}
+      <NavBare/>
     </>
   );
 }
