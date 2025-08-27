@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LogoGrey from "../../public/LogoGrey.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
@@ -7,6 +7,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [errPassword, setErrPassword] = useState("");
   const [show, setShow] = useState(false);
+  const navigate = useNavigate();
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -21,7 +22,9 @@ function Login() {
 
     if(password){
       console.log("success")
+      
       clearForm()
+      navigate("/services")
     }
   }
 const clearForm =() =>  {

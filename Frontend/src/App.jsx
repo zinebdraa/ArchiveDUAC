@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
 import Login from "./Account/Login";
 import SideBar from "./components/SideBar";
 import NavBare from "./components/NavBare";
+import Service from "./pages/Service";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -21,7 +23,17 @@ function App() {
       </div> */}
       {/* <Login/> */}
       {/* <SideBar/> */}
-      <NavBare/>
+      {/* <NavBare/> */}
+      {/* <Service/> */}
+      
+      <Routes>
+        <Route path="/" element={<Login/>} />
+        <Route path="/services" element={<Service />} />
+        {/* <Route path="/bureaus" element={<Bureaus />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="*" element={<NotFound />} /> */}
+      </Routes>
+    
     </>
   );
 }
