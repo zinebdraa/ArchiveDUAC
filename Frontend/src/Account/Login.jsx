@@ -35,7 +35,7 @@ setErrPassword("")
     <div className="grid grid-col-1 md:grid-cols-2 w-screen h-screen">
       <div className="h-screen  bg-primary-green  hidden md:block">
         <div className=" flex justify-between items-center flex-col">
-          <div className="w-[300px] h-[300px]">
+          <div className="size-[200px] m-[50px]">
             <img src={LogoGrey} alt="" className="w-full h-full" />
           </div>
           <p className="font-semibold text-2xl  text-green-3 w-[300px] text-center">

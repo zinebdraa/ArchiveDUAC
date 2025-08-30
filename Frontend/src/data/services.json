@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "name" :"Le Service de l’Architecture et de la Construction"
+    },
+    {
+        "id": 2,
+        "name" :"Le Service de l’Administration et des Moyens"
+    },
+    {
+        "id": 3,
+        "name" :"Le Service du Suivi des Marchés Publics"
+    },
+    {
+        "id": 4,
+        "name" :"Le Service de l’Urbanisme et des Aménagements Urbains"
+    }
+]

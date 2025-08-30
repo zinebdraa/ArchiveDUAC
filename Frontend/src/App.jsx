@@ -5,6 +5,9 @@ import Login from "./Account/Login";
 import SideBar from "./components/SideBar";
 import NavBare from "./components/NavBare";
 import Service from "./pages/Service";
+import Bureaux from "./pages/Bureaux";
+import AddService from "./pages/AddService";
+import AddPage from "./pages/AddPage";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -25,15 +28,16 @@ function App() {
       {/* <SideBar/> */}
       {/* <NavBare/> */}
       {/* <Service/> */}
-      
+
       <Routes>
-        <Route path="/" element={<Login/>} />
+        <Route path="/" element={<Login />} />
         <Route path="/services" element={<Service />} />
-        {/* <Route path="/bureaus" element={<Bureaus />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="*" element={<NotFound />} /> */}
+        <Route path="/bureaux" element={<Bureaux />} />
+        <Route path="/bureaux/:serviceId" element={<Bureaux />} />
+        <Route path="/addService" element={<AddService />} />
+        <Route path="/addPage" element={<AddPage/>} />
       </Routes>
-    
+      
     </>
   );
 }
