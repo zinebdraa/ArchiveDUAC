@@ -8,6 +8,9 @@ import Service from "./pages/Service";
 import Bureaux from "./pages/Bureaux";
 import AddService from "./pages/AddService";
 import AddPage from "./pages/AddPage";
+import ResetPassword from "./Account/ResetPassword";
+import NewPassword from "./Account/NewPassword";
+import Chemise from "./pages/Chemise";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -34,10 +37,11 @@ function App() {
         <Route path="/services" element={<Service />} />
         <Route path="/bureaux" element={<Bureaux />} />
         <Route path="/bureaux/:serviceId" element={<Bureaux />} />
-        <Route path="/addService" element={<AddService />} />
-        <Route path="/addPage" element={<AddPage/>} />
+        <Route path="/addPage" element={<AddPage />} />
+        <Route path="/resetPassword" element={<ResetPassword />} />
+        <Route path="/newPassword" element={<NewPassword />} />
+        <Route path="/chemise" element={<Chemise />} />
       </Routes>
-      
     </>
   );
 }

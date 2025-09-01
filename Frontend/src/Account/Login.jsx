@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import LogoGrey from "../../public/LogoGrey.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
@@ -7,6 +8,7 @@ function Login() {
   const [password, setPassword] = useState("");
   const [errPassword, setErrPassword] = useState("");
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handlePasswordChange = (e) => {
@@ -14,23 +16,91 @@ function Login() {
     setErrPassword("");
   };
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = async(e) => {
+  //   e.preventDefault();
+  //   if (!password) {
+  //     setErrPassword("Merci d'entrer votre mot de passe ");
+  //   }
+
+  //   if(password){
+  //     console.log("success")
+
+  //     try {
+  //       const response = await axios.post(
+  //         "https://dz-event-1-rsgd.onrender.com/api/login",
+  //         {
+  //           password,
+  //         },
+  //         {
+  //           headers: {
+  //             "Content-Type": "application/json", // Add this if required
+  //           },
+  //         }
+  //       );
+
+  //       if (response.status === 200) {
+  //         localStorage.setItem("token", response.data.token);
+  //         navigate("/services")
+  //       }
+  //     } catch (err) {
+  //       console.log(err.message);
+  //     }
+  //     clearForm()
+
+  //   }
+  // }
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!password) {
-      setErrPassword("Merci d'entrer votre mot de passe ");
+
+    // Validate password
+    if (!password.trim()) {
+      setErrPassword("Merci d'entrer votre mot de passe");
+      return;
     }
 
-    if(password){
-      console.log("success")
-      
-      clearForm()
-      navigate("/services")
+    setLoading(true);
+    if (password) {
+      console.log("success");
+      navigate("/services");
     }
-  }
-const clearForm =() =>  {
-setPassword("")
-setErrPassword("")
-}
+
+    // try {
+    //   const response = await axios.post(
+    //     "https://dz-event-1-rsgd.onrender.com/api/login",
+    //     { password },
+    //     {
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //     }
+    //   );
+
+    //   if (response.status === 200) {
+    //     localStorage.setItem("token", response.data.token);
+    //     navigate("/services");
+    //   }
+    // } catch (err) {
+    //   console.error("Login error:", err);
+
+    //   // Handle different error scenarios
+    //   if (err.response?.status === 401) {
+    //     setErrPassword("Mot de passe incorrect");
+    //   } else if (err.response?.status >= 500) {
+    //     setErrPassword("Erreur du serveur. Veuillez réessayer plus tard");
+    //   } else {
+    //     setErrPassword(
+    //       "Erreur de connexion. Vérifiez votre connexion internet"
+    //     );
+    //   }
+    // } finally {
+    //   setLoading(false);
+    // }
+  };
+  const clearForm = () => {
+    setPassword("");
+    setErrPassword("");
+  };
+
   return (
     <div className="grid grid-col-1 md:grid-cols-2 w-screen h-screen">
       <div className="h-screen  bg-primary-green  hidden md:block">
@@ -55,7 +125,7 @@ setErrPassword("")
           </h1>
           <div className="">
             <div className=" w-[100%]">
-              <label htmlFor="" >Veuillez entrer le mot de passe</label>
+              <label htmlFor="">Veuillez entrer le mot de passe</label>
               <div className="relative w-[120%] mt-3">
                 <input
                   type={show ? "text" : "password"}
@@ -63,10 +133,12 @@ setErrPassword("")
                   placeholder="Password"
                   value={password}
                   onChange={handlePasswordChange}
+                  disabled={loading}
                 />
                 <button
                   type="button"
                   onClick={() => setShow(!show)}
+                  disabled={loading}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 "
                 >
                   {show ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
@@ -76,16 +148,19 @@ setErrPassword("")
             {errPassword && (
               <p className="text-red-500 text-xs">{errPassword}</p>
             )}
-            <Link>
-          <p className="underline text-xs mt-1">Mot de passe oublié?</p>
-          </Link>
+            <Link to="/resetPassword">
+              <p className="underline text-xs mt-1">Mot de passe oublié?</p>
+            </Link>
           </div>
-          
-         <button type="submit" className="rounded-xl bg-primary-green text-white shadow-2xl font-bold px-7 py-2">
-          Log in
-         </button>
+
+          <button
+            type="submit"
+            className="rounded-xl bg-primary-green text-white shadow-2xl font-bold px-7 py-2"
+            disabled={loading}
+          >
+            {loading ? "Connexion..." : "Log in"}
+          </button>
         </form>
-         
       </div>
     </div>
   );
