@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Administrative1",
+    "bureauId": 1
+  },
+  {
+    "id": 2,
+    "name": "Administrative2",
+    "bureauId": 1
+  },
+  {
+    "id": 3,
+    "name": "Administrative3",
+    "bureauId": 2
+  },
+  {
+    "id": 4,
+    "name": "Administrative4",
+    "bureauId": 3
+  },
+  {
+    "id": 5,
+    "name": "Administrative5",
+    "bureauId": 3
+  },
+  {
+    "id": 6,
+    "name": "Administrative6",
+    "bureauId": 1
+  }
+]

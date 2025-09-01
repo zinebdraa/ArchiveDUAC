@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate, remove Navigate
 import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import services from "../data/services.json";
 import { IoAddCircleOutline } from "react-icons/io5";
 
 const Service = () => {
+  const navigate = useNavigate(); // Use the navigate hook
   const [results, setResults] = useState([]);
-
+  
   const handleSearch = (query) => {
     if (query.trim() === "") {
       setResults(services);
@@ -17,6 +18,10 @@ const Service = () => {
       );
       setResults(filtered);
     }
+  };
+
+  const handleAddService = () => {
+    navigate('/addPage?type=service'); // Use navigate function, not Navigate component
   };
 
   useEffect(() => {
@@ -47,12 +52,14 @@ const Service = () => {
                     </Link>
                   </li>
                 ))}
-
                 <li className="flex justify-center items-center text-center hover:border-2 hover:border-primary-green hover:rounded-lg">
-                  <Link to="/addService" className="size-full flex justify-center items-center flex-col">
+                  <button
+                    onClick={handleAddService}
+                    className="size-full flex justify-center items-center flex-col hover:bg-gray-50 transition-colors duration-200"
+                  >
                     <IoAddCircleOutline className="size-[40px] mx-auto mb-5" />
                     <p>Ajouter un Service</p>
-                  </Link>
+                  </button>
                 </li>
               </ul>
             ) : (

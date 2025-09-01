@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import bureauxData from "../data/bureaux.json";
@@ -8,6 +8,7 @@ import { CgAddR } from "react-icons/cg";
 import { CgCornerDownLeft } from "react-icons/cg";
 
 const Bureaux = () => {
+  const navigate = useNavigate();
   const [results, setResults] = useState([]);
   const { serviceId } = useParams();
 
@@ -28,6 +29,10 @@ const Bureaux = () => {
       );
       setResults(filtered);
     }
+  };
+
+  const handleAddService = () => {
+    navigate("/addPage?type=bureau"); // Use navigate function, not Navigate component
   };
 
   useEffect(() => {
@@ -68,10 +73,13 @@ const Bureaux = () => {
                 ))}
 
                 <li className="flex justify-center items-center text-center border-2 border-primary-green rounded-lg bg-green-4 hover:bg-primary-green hover:text-green-4">
-                  <Link className="size-full flex justify-center items-center m-auto ">
+                  <button
+                    className="size-full flex justify-center items-center m-auto "
+                    onClick={handleAddService}
+                  >
                     <CgAddR className="size-[30px] mr-3 font-thin " />
                     <p>Ajouter un Bureau</p>
-                  </Link>
+                  </button>
                 </li>
               </ul>
             ) : (
