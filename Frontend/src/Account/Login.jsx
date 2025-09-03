@@ -66,11 +66,12 @@ function Login() {
 
     try {
       const response = await axios.post(
-        "https://dz-event-1-rsgd.onrender.com/api/login",
+        "http://localhost:3001/api/auth/login",
         { password },
         {
           headers: {
             "Content-Type": "application/json",
+            
           },
         }
       );

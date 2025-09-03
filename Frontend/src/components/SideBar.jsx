@@ -1,6 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import LogoGrey from "../../public/LogoGrey.png";
 import { PiCallBellLight } from "react-icons/pi";
 import { LiaServerSolid } from "react-icons/lia";
@@ -9,10 +8,14 @@ import { MdOutlineLogout } from "react-icons/md";
 import { IoSettings } from "react-icons/io5";
 import { VscFileSubmodule } from "react-icons/vsc";
 import { IoLibraryOutline } from "react-icons/io5";
-import Chemise from "../assets/icons/folders-light.svg";
-import Doc from "../assets/icons/mdl2_document-set.svg";
 
 function SideBar() {
+  const navigate = useNavigate();
+
+  const removeToken = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
   return (
     <div className="flex flex-col justify-between items-center bg-primary-green text-green-4 h-screen text-xl">
       <div className="size-[150px]">
@@ -105,10 +108,10 @@ function SideBar() {
       </div>
 
       <div className="flex  items-center w-[80%] p-3 mb-2 rounded-lg hover:bg-green-4 hover:text-primary-green">
-        <Link to="/" className="flex">
+        <button className="flex" onClick={removeToken}>
           <MdOutlineLogout className="size-[25px] mx-5" />
           <p>Déconnexion</p>
-        </Link>
+        </button>
       </div>
     </div>
   );

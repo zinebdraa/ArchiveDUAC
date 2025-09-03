@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate, remove Navigate
+import axios from "axios";
 import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import services from "../data/services.json";
@@ -8,7 +9,7 @@ import { IoAddCircleOutline } from "react-icons/io5";
 const Service = () => {
   const navigate = useNavigate(); // Use the navigate hook
   const [results, setResults] = useState([]);
-  
+
   const handleSearch = (query) => {
     if (query.trim() === "") {
       setResults(services);
@@ -21,11 +22,27 @@ const Service = () => {
   };
 
   const handleAddService = () => {
-    navigate('/addPage?type=service'); // Use navigate function, not Navigate component
+    navigate("/addPage?type=service"); // Use navigate function, not Navigate component
   };
 
   useEffect(() => {
-    setResults(services);
+    const fetchServices = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("http://localhost:3001/api/services", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("API response:", response.data);
+        // 👇 use response.data directly (it's an array)
+        setResults(response.data || []);
+      } catch (error) {
+        console.error("Error fetching services:", error);
+        setResults([]); // fallback to empty
+      }
+    };
+
+    fetchServices();
   }, []);
 
   return (
@@ -41,14 +58,14 @@ const Service = () => {
               <ul className="grid grid-cols-3 gap-2 h-full font-semibold">
                 {results.map((service) => (
                   <li
-                    key={service.id}
+                    key={service.id_service}
                     className="flex justify-center items-center text-center hover:border-2 hover:border-primary-green hover:rounded-lg"
                   >
                     <Link
-                      to={`/bureaux/${service.id}`}
+                      to={`/bureaux/${service.id_service}`}
                       className="size-full flex justify-center items-center"
                     >
-                      <p>{service.name}</p>
+                      <p>{service.service_name}</p>
                     </Link>
                   </li>
                 ))}
