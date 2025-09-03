@@ -59,42 +59,42 @@ function Login() {
     }
 
     setLoading(true);
-    if (password) {
-      console.log("success");
-      navigate("/services");
-    }
-
-    // try {
-    //   const response = await axios.post(
-    //     "https://dz-event-1-rsgd.onrender.com/api/login",
-    //     { password },
-    //     {
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
-
-    //   if (response.status === 200) {
-    //     localStorage.setItem("token", response.data.token);
-    //     navigate("/services");
-    //   }
-    // } catch (err) {
-    //   console.error("Login error:", err);
-
-    //   // Handle different error scenarios
-    //   if (err.response?.status === 401) {
-    //     setErrPassword("Mot de passe incorrect");
-    //   } else if (err.response?.status >= 500) {
-    //     setErrPassword("Erreur du serveur. Veuillez réessayer plus tard");
-    //   } else {
-    //     setErrPassword(
-    //       "Erreur de connexion. Vérifiez votre connexion internet"
-    //     );
-    //   }
-    // } finally {
-    //   setLoading(false);
+    // if (password) {
+    //   console.log("success");
+    //   navigate("/services");
     // }
+
+    try {
+      const response = await axios.post(
+        "https://dz-event-1-rsgd.onrender.com/api/login",
+        { password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        localStorage.setItem("token", response.data.token);
+        navigate("/services");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+
+      // Handle different error scenarios
+      if (err.response?.status === 401) {
+        setErrPassword("Mot de passe incorrect");
+      } else if (err.response?.status >= 500) {
+        setErrPassword("Erreur du serveur. Veuillez réessayer plus tard");
+      } else {
+        setErrPassword(
+          "Erreur de connexion. Vérifiez votre connexion internet"
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
   const clearForm = () => {
     setPassword("");
