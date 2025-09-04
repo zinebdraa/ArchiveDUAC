@@ -351,6 +351,9 @@ const AddBureau = () => {
         setSuccess("Bureau ajouté avec succès !");
         clearForm();
       }
+      setTimeout(() => {
+          setSuccess("");
+        }, 4000);
     } catch (err) {
       console.error("Add Bureau error:", err);
       setError("Impossible d’ajouter Bureau. Réessayez plus tard.");

@@ -11,6 +11,8 @@ import AddPage from "./pages/AddPage";
 import ResetPassword from "./Account/ResetPassword";
 import NewPassword from "./Account/NewPassword";
 import Chemise from "./pages/Chemise";
+import Document from "./pages/Document";
+import Parametre from "./pages/Parametre";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -41,6 +43,8 @@ function App() {
         <Route path="/resetPassword" element={<ResetPassword />} />
         <Route path="/newPassword" element={<NewPassword />} />
         <Route path="/chemise" element={<Chemise />} />
+        <Route path="/document" element={<Document />} />
+        <Route path="/parametre" element={<Parametre />} />
       </Routes>
     </>
   );

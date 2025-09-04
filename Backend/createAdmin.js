@@ -1,4 +1,4 @@
-/*
+
 const db = require("./db");   // reuse your db connection
 const bcrypt = require("bcrypt");
 
@@ -22,4 +22,3 @@ async function createAdmin() {
 }
 
 createAdmin();
-*/

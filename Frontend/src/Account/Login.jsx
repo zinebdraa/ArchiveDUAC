@@ -16,39 +16,6 @@ function Login() {
     setErrPassword("");
   };
 
-  // const handleSubmit = async(e) => {
-  //   e.preventDefault();
-  //   if (!password) {
-  //     setErrPassword("Merci d'entrer votre mot de passe ");
-  //   }
-
-  //   if(password){
-  //     console.log("success")
-
-  //     try {
-  //       const response = await axios.post(
-  //         "https://dz-event-1-rsgd.onrender.com/api/login",
-  //         {
-  //           password,
-  //         },
-  //         {
-  //           headers: {
-  //             "Content-Type": "application/json", // Add this if required
-  //           },
-  //         }
-  //       );
-
-  //       if (response.status === 200) {
-  //         localStorage.setItem("token", response.data.token);
-  //         navigate("/services")
-  //       }
-  //     } catch (err) {
-  //       console.log(err.message);
-  //     }
-  //     clearForm()
-
-  //   }
-  // }
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -59,10 +26,6 @@ function Login() {
     }
 
     setLoading(true);
-    // if (password) {
-    //   console.log("success");
-    //   navigate("/services");
-    // }
 
     try {
       const response = await axios.post(
@@ -79,6 +42,7 @@ function Login() {
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
         navigate("/services");
+        clearForm()
       }
     } catch (err) {
       console.error("Login error:", err);

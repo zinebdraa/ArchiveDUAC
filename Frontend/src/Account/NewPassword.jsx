@@ -5,7 +5,7 @@ import LogoGrey from "../../public/LogoGrey.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const NewPassword = () => {
-  const [password, setPassword] = useState("");
+  const [new_password, setPassword] = useState("");
   const [errPassword, setErrPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errConfirmPassword, setErrConfirmPassword] = useState("");
@@ -13,6 +13,8 @@ const NewPassword = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const [err, setErr] = useState("");
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -24,7 +26,7 @@ const NewPassword = () => {
   };
 
   const ConfirmPasswordValidation = (confirmPassword) => {
-    if (confirmPassword === password) {
+    if (confirmPassword === new_password) {
       return true;
     } else {
       return false;
@@ -36,11 +38,11 @@ const NewPassword = () => {
     let valid = true;
 
     // Validate password
-    if (!password.trim()) {
+    if (!new_password.trim()) {
       setErrPassword("Merci d'entrer votre mot de passe");
       valid = false;
     }
-    if (password.trim().length < 8) {
+    if (new_password.trim().length < 8) {
       setErrPassword("le mot de passe doit contenir plus de 8 caractères");
       valid = false;
     }
@@ -48,23 +50,58 @@ const NewPassword = () => {
       setErrConfirmPassword("Merci de confirmer votre mot de passe");
       valid = false;
     }
-    if(!ConfirmPasswordValidation(confirmPassword)){
-        setErrPassword("Les mots de passe ne correspondent pas");
-        setErrConfirmPassword("Les mots de passe ne correspondent pas");
-        valid = false;
+    if (!ConfirmPasswordValidation(confirmPassword)) {
+      setErrPassword("Les mots de passe ne correspondent pas");
+      setErrConfirmPassword("Les mots de passe ne correspondent pas");
+      valid = false;
     }
 
     if (!valid) return;
 
     setLoading(true);
-    if (
-      password &&
-      confirmPassword &&
-      ConfirmPasswordValidation(confirmPassword)
-    ) {
-      console.log("success");
-      navigate("/services");
+    // if (
+    //   password &&
+    //   confirmPassword &&
+    //   ConfirmPasswordValidation(confirmPassword)
+    // ) {
+    //   console.log("success");
+    //   navigate("/services");
+    // }
+    try {
+      const response = await axios.put(
+        "http://localhost:3001/api/users/forgot-password",
+        { new_password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        navigate("/services");
+        clearForm();
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+
+      // Handle different error scenarios
+      if (err.response?.status === 401) {
+        setErr("Mot de passe incorrect");
+      } else if (err.response?.status >= 500) {
+        setErr("Erreur du serveur. Veuillez réessayer plus tard");
+      } else {
+        setErr("Erreur de connexion. Vérifiez votre connexion internet");
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+  const clearForm = () => {
+    setErrConfirmPassword("");
+    setConfirmPassword("");
+    setErrPassword("");
+    setPassword("");
   };
   return (
     <div className="grid grid-col-1 md:grid-cols-2 w-screen h-screen">
@@ -97,7 +134,7 @@ const NewPassword = () => {
                     type={show ? "text" : "password"}
                     className=" border-2 border-primary-green rounded-[8px] w-[100%] h-[40px] p-[15px] pl-[40px]"
                     placeholder="mot de passe"
-                    value={password}
+                    value={new_password}
                     onChange={handlePasswordChange}
                     disabled={loading}
                   />
@@ -111,10 +148,9 @@ const NewPassword = () => {
                   </button>
                 </div>
                 {errPassword && (
-                <p className="text-red-500 text-xs">{errPassword}</p>
-              )}
+                  <p className="text-red-500 text-xs">{errPassword}</p>
+                )}
               </div>
-              
             </div>
 
             <div className="">
@@ -139,13 +175,12 @@ const NewPassword = () => {
                   </button>
                 </div>
                 {errConfirmPassword && (
-                <p className="text-red-500 text-xs">{errConfirmPassword}</p>
-              )}
+                  <p className="text-red-500 text-xs">{errConfirmPassword}</p>
+                )}
               </div>
-              
             </div>
           </div>
-
+          {err && <p className="text-red-500 text-sm">{err}</p>}
           <button
             type="submit"
             className="rounded-xl bg-primary-green text-white shadow-2xl font-bold px-7 py-2"

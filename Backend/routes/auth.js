@@ -88,31 +88,37 @@ router.post("/verify-password", authenticateToken, (req, res) => {
   }
 });
 
-// Update user profile (email or phone)
+// Update user profile (email or phone or username or password)
 router.put("/profile", authenticateToken, (req, res) => {
   try {
-    const { user_email, user_num, password } = req.body;
+    const { user_name, user_email, user_num, password, new_password } = req.body;
     const userId = req.user.userId;
 
     if (!password) {
       return res.status(400).json({ error: "Password required for profile updates" });
     }
 
-    if (!user_email && !user_num) {
-      return res.status(400).json({ error: "At least one field (email or phone) must be provided" });
+    // if (!user_name && !user_email && !user_num) {
+    //   return res.status(400).json({ error: "At least one field (username or email or phone) must be provided" });
+    // }
+
+    const user = db.prepare("SELECT password FROM users WHERE id_user = ?").get(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found"});
     }
 
-    // Verify password first
-    const user = db.prepare("SELECT password FROM users WHERE id_user = ?").get(userId);
     const isValidPassword = bcrypt.compareSync(password, user.password);
-    
     if (!isValidPassword) {
       return res.status(401).json({ error: "Invalid password" });
     }
 
-    // Build update query dynamically
     const updates = [];
     const values = [];
+
+    if (user_name) {
+      updates.push("user_name = ?");
+      values.push(user_name);
+    }
 
     if (user_email) {
       updates.push("user_email = ?");
@@ -124,6 +130,16 @@ router.put("/profile", authenticateToken, (req, res) => {
       values.push(user_num);
     }
 
+    if (new_password) {
+      const hashedNewPassword = bcrypt.hashSync(new_password, 10);
+      updates.push("password = ?");
+      values.push(hashedNewPassword);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error : "No valid fields provided for update"});
+    }
+
     values.push(userId);
 
     const updateQuery = `UPDATE users SET ${updates.join(", ")} WHERE id_user = ?`;
@@ -133,12 +149,13 @@ router.put("/profile", authenticateToken, (req, res) => {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Return updated user data
+    // Return updated user data 
     const updatedUser = db.prepare("SELECT id_user, user_name, user_email, user_num FROM users WHERE id_user = ?").get(userId);
     
     res.json({
       message: "Profile updated successfully",
-      user: updatedUser
+      user: updatedUser,
+      passwordChanged: !!new_password
     });
 
   } catch (error) {
@@ -150,22 +167,22 @@ router.put("/profile", authenticateToken, (req, res) => {
   }
 });
 
-// Logout route
-router.post("/logout", authenticateToken, (req, res) => {
-  try {
-    // Since JWT tokens are stateless, we can't invalidate them server-side
-    // The client should remove the token from storage
-    // In a more complex system, you might maintain a blacklist of tokens
+// // Logout route
+// router.post("/logout", authenticateToken, (req, res) => {
+//   try {
+//     // Since JWT tokens are stateless, we can't invalidate them server-side
+//     // The client should remove the token from storage
+//     // In a more complex system, you might maintain a blacklist of tokens
     
-    res.json({
-      message: "Logout successful. Please remove the token from client storage."
-    });
+//     res.json({
+//       message: "Logout successful. Please remove the token from client storage."
+//     });
 
-  } catch (error) {
-    console.error("Logout error:", error);
-    res.status(500).json({ error: "Server error during logout" });
-  }
-});
+//   } catch (error) {
+//     console.error("Logout error:", error);
+//     res.status(500).json({ error: "Server error during logout" });
+//   }
+// });
 
 // Middleware to authenticate JWT token
 function authenticateToken(req, res, next) {

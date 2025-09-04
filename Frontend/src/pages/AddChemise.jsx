@@ -81,7 +81,7 @@
 //           chemise_place,
 //           cCreatedDate,
 //           cDescription,
-//           bureau_name: bureau_name.bureau_name, 
+//           bureau_name: bureau_name.bureau_name,
 //         },
 //         {
 //           headers: {
@@ -364,8 +364,8 @@ import { HiMiniChevronUpDown } from "react-icons/hi2";
 const AddChemise = () => {
   const token = localStorage.getItem("token");
 
-  const [services, setServices] = useState([]); // Services from API
-  const [bureaux, setBureaux] = useState([]); // All bureaux from API
+  const [services, setServices] = useState([]);
+  const [bureaux, setBureaux] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -393,15 +393,14 @@ const AddChemise = () => {
     fetchServices();
   }, []);
 
-
   // Fetch bureaux when a service is selected
   useEffect(() => {
-  if (selectedService) {
-    fetchBureaux(selectedService.id_service); // pass the service ID
-  } else {
-    setBureaux([]); // reset when no service is selected
-  }
-}, [selectedService]);
+    if (selectedService) {
+      fetchBureaux(selectedService.id_service); // pass the service ID
+    } else {
+      setBureaux([]); // reset when no service is selected
+    }
+  }, [selectedService]);
 
   const fetchServices = async () => {
     try {
@@ -421,27 +420,26 @@ const AddChemise = () => {
   };
 
   const fetchBureaux = async (serviceId) => {
-  try {
-    setLoadingBureaux(true);
-    const response = await axios.get(
-      `http://localhost:3001/api/bureaus`,
-      {
+    try {
+      setLoadingBureaux(true);
+      const response = await axios.get(`http://localhost:3001/api/bureaus`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-    // Filter bureaux by service_id on the client side
-    const filteredBureaux = response.data.filter(bureau => bureau.service_id === serviceId);
-    setBureaux(filteredBureaux);
-  } catch (err) {
-    console.error("Error fetching bureaux:", err);
-    setError("Impossible de charger les bureaux. Réessayez plus tard.");
-    setBureaux([]);
-  } finally {
-    setLoadingBureaux(false);
-  }
-};
+      });
+      // Filter bureaux by service_id on the client side
+      const filteredBureaux = response.data.filter(
+        (bureau) => bureau.service_id === serviceId
+      );
+      setBureaux(filteredBureaux);
+    } catch (err) {
+      console.error("Error fetching bureaux:", err);
+      setError("Impossible de charger les bureaux. Réessayez plus tard.");
+      setBureaux([]);
+    } finally {
+      setLoadingBureaux(false);
+    }
+  };
 
   // Filter services based on search query
   const filteredServices =
@@ -504,8 +502,7 @@ const AddChemise = () => {
           chemise_place,
           cCreatedDate,
           cDescription,
-          bureau_name: bureau_name.bureau_name, 
-          service_name: selectedService.service_id, 
+          bureau_name: bureau_name.bureau_name,
         },
         {
           headers: {
@@ -520,6 +517,9 @@ const AddChemise = () => {
         setSuccess("Chemise ajoutée avec succès !");
         clearForm();
       }
+      setTimeout(() => {
+          setSuccess("");
+        }, 4000);
     } catch (err) {
       console.error("Add Chemise error:", err);
       setError("Impossible d'ajouter la chemise. Réessayez plus tard.");
@@ -540,7 +540,6 @@ const AddChemise = () => {
     setSelectedBureau(null);
     setServiceQuery("");
     setBureauQuery("");
-    setSuccess("");
     setError("");
   };
 
@@ -568,7 +567,11 @@ const AddChemise = () => {
                     className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 focus:ring-0"
                     displayValue={(service) => service?.service_name || ""}
                     onChange={(event) => setServiceQuery(event.target.value)}
-                    placeholder={loadingServices ? "Chargement..." : "-- Choisir un service --"}
+                    placeholder={
+                      loadingServices
+                        ? "Chargement..."
+                        : "-- Choisir un service --"
+                    }
                     disabled={loadingServices}
                   />
                   <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
@@ -632,10 +635,13 @@ const AddChemise = () => {
               <label htmlFor="bureau" className="font-medium w-[150px]">
                 Bureau lié <span className="text-red-500">*</span> :
               </label>
-              <Combobox value={bureau_name} onChange={(b) => {
-                setSelectedBureau(b);
-                setErrSelectedBureau("");
-              }}>
+              <Combobox
+                value={bureau_name}
+                onChange={(b) => {
+                  setSelectedBureau(b);
+                  setErrSelectedBureau("");
+                }}
+              >
                 <div className="relative w-full">
                   <div className="relative cursor-default overflow-hidden rounded-md border border-gray-300 bg-white text-left shadow-sm focus-within:ring-1 focus-within:ring-primary-green sm:text-sm">
                     <Combobox.Input
@@ -643,7 +649,11 @@ const AddChemise = () => {
                       className="w-full border-none py-2 pl-3 pr-10 leading-5 text-gray-900 focus:ring-0"
                       displayValue={(bureau) => bureau?.bureau_name || ""}
                       onChange={(event) => setBureauQuery(event.target.value)}
-                      placeholder={loadingBureaux ? "Chargement..." : "-- Choisir un bureau --"}
+                      placeholder={
+                        loadingBureaux
+                          ? "Chargement..."
+                          : "-- Choisir un bureau --"
+                      }
                       disabled={loadingBureaux}
                     />
                     <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
@@ -694,11 +704,13 @@ const AddChemise = () => {
                       ))}
                     </Combobox.Options>
                   )}
-                  {!loadingBureaux && selectedService && filteredBureaux.length === 0 && (
-                    <div className="absolute mt-1 w-full rounded-md bg-white py-2 px-3 text-sm text-gray-500 shadow-lg ring-1 ring-black/5">
-                      Aucun bureau trouvé pour ce service
-                    </div>
-                  )}
+                  {!loadingBureaux &&
+                    selectedService &&
+                    filteredBureaux.length === 0 && (
+                      <div className="absolute mt-1 w-full rounded-md bg-white py-2 px-3 text-sm text-gray-500 shadow-lg ring-1 ring-black/5">
+                        Aucun bureau trouvé pour ce service
+                      </div>
+                    )}
                 </div>
               </Combobox>
               {errSelectedBureau && (

@@ -5,11 +5,12 @@ import LogoGrey from "../../public/LogoGrey.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 const ResetPassword = () => {
-  const [email, setEmail] = useState("");
+  const [user_email, setEmail] = useState("");
   const [errEmail, setErrEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [user_num, setPhone] = useState("");
   const [errPhone, setErrPhone] = useState("");
   const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
   const navigate = useNavigate();
 
   const handleEmailChange = (e) => {
@@ -31,21 +32,21 @@ const ResetPassword = () => {
     return /^(?:0[0-9]{9}|\+213[0-9]{9})$/.test(String(phone));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let valid = true;
 
-    if (!email) {
+    if (!user_email) {
       setErrEmail("Merci d'entrer votre email");
       valid = false;
-    } else if (!emailValidation(email)) {
+    } else if (!emailValidation(user_email)) {
       setErrEmail("Merci d'entrer un email valide");
       valid = false;
     }
-    if (!phone) {
+    if (!user_num) {
       setErrPhone("Merci d'entrer votre numero de telephone");
       valid = false;
-    } else if (!phoneValidation(phone)) {
+    } else if (!phoneValidation(user_num)) {
       setErrPhone("Merci d'entrer un numero de telephone valide");
       valid = false;
     }
@@ -53,10 +54,46 @@ const ResetPassword = () => {
     if (!valid) return;
 
     setLoading(true);
-    if (email && phone && emailValidation(email) && phoneValidation(phone)) {
-      console.log("success");
-      navigate("/newPassword");
+    // if (email && phone && emailValidation(email) && phoneValidation(phone)) {
+    //   console.log("success");
+    //   navigate("/newPassword");
+    // }
+    try {
+      const response = await axios.put(
+        "http://localhost:3001/api/users/forgot-password",
+        { user_email, user_num },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        navigate("/newPassword");
+        clearForm();
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+
+      // Handle different error scenarios
+      if (err.response?.status === 401) {
+        setErr("Mot de passe incorrect");
+      } else if (err.response?.status >= 500) {
+        setErr("Erreur du serveur. Veuillez réessayer plus tard");
+      } else {
+        setErr("Erreur de connexion. Vérifiez votre connexion internet");
+      }
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const clearForm = () => {
+    setEmail("");
+    setErrEmail("");
+    setErrPhone("");
+    setPhone("");
   };
 
   return (
@@ -89,7 +126,7 @@ const ResetPassword = () => {
                   type="email"
                   className=" border-2 border-primary-green rounded-[8px] w-[100%] h-[40px] p-[15px] pl-[40px]"
                   placeholder="Email"
-                  value={email}
+                  value={user_email}
                   onChange={handleEmailChange}
                   disabled={loading}
                 />
@@ -105,7 +142,7 @@ const ResetPassword = () => {
                   type="tel"
                   className=" border-2 border-primary-green rounded-[8px] w-[100%] h-[40px] p-[15px] pl-[40px]"
                   placeholder="Numero de telephone"
-                  value={phone}
+                  value={user_num}
                   onChange={handlePhoneChange}
                   disabled={loading}
                 />
@@ -114,7 +151,7 @@ const ResetPassword = () => {
               {errPhone && <p className="text-red-500 text-xs">{errPhone}</p>}
             </div>
           </div>
-
+          {err && <p className="text-red-500 text-sm">{err}</p>}
           <button
             type="submit"
             className="rounded-xl bg-primary-green text-white shadow-2xl font-bold px-7 py-2"

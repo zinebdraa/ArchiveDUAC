@@ -66,7 +66,7 @@ function SideBar() {
           </li>
           <li className="flex  items-center p-3 rounded-lg hover:bg-green-4 hover:text-primary-green">
             <NavLink
-              to="/doc"
+              to="/document"
               className={({ isActive }) =>
                 isActive
                   ? "flex size-full p-3 rounded-lg  bg-green-4 text-primary-green "
@@ -93,7 +93,7 @@ function SideBar() {
           </li>
           <li className="flex  items-center p-3 rounded-lg hover:bg-green-4 hover:text-primary-green">
             <NavLink
-              to="/param"
+              to="/parametre"
               className={({ isActive }) =>
                 isActive
                   ? "flex size-full p-3 rounded-lg  bg-green-4 text-primary-green "

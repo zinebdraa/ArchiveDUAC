@@ -80,10 +80,9 @@ router.post("/", authenticateToken, (req, res) => {
    
     // Get the created chemise with bureau and service info
     const newChemise = db.prepare(`
-      SELECT c.*, b.bureau_name, s.service_name
+      SELECT c.*, b.bureau_name
       FROM chemises c
       JOIN bureaus b ON c.bureau_id = b.id_bureau
-      JOIN services s ON b.id_service = s.id_service
       WHERE c.id_chemise = ?
     `).get(result.lastInsertRowid);
    
