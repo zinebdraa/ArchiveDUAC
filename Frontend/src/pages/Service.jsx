@@ -5,6 +5,7 @@ import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import services from "../data/services.json";
 import { IoAddCircleOutline } from "react-icons/io5";
+import { CiCircleInfo } from "react-icons/ci";
 
 const Service = () => {
   const navigate = useNavigate(); // Use the navigate hook
@@ -59,8 +60,14 @@ const Service = () => {
                 {results.map((service) => (
                   <li
                     key={service.id_service}
-                    className="flex justify-center items-center text-center hover:border-2 hover:border-primary-green hover:rounded-lg"
+                    className="flex justify-center relative items-center text-center border-2 border-primary-green rounded-lg hover:text-white hover:bg-primary-green"
                   >
+                    <Link 
+                      to="/editService"
+                      className="absolute left-3 top-[20px] -translate-y-1/2 z-10"
+                    >
+                      <CiCircleInfo className="hover:scale-110 transition-transform" />
+                    </Link>
                     <Link
                       to={`/bureaux/${service.id_service}`}
                       className="size-full flex justify-center items-center"

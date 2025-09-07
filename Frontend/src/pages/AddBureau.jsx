@@ -261,7 +261,7 @@ import { HiMiniChevronUpDown } from "react-icons/hi2";
 const AddBureau = () => {
   const token = localStorage.getItem("token");
 
-  const [services, setServices] = useState([]); // ✅ services from API
+  const [services, setServices] = useState([]); 
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -277,7 +277,7 @@ const AddBureau = () => {
   const [errSelectedService, setErrSelectedService] = useState("");
   const [query, setQuery] = useState("");
 
-  // ✅ Fetch services from backend
+  // Fetch services from backend
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -293,7 +293,7 @@ const AddBureau = () => {
     fetchServices();
   }, [token]);
 
-  // ✅ Filter services by query
+  // Filter services by query
   const filteredServices =
     query === ""
       ? services

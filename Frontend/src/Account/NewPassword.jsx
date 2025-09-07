@@ -128,7 +128,7 @@ const NewPassword = () => {
           <div>
             <div className="">
               <div className=" w-[100%] mb-5">
-                <label htmlFor="">Veuillez entrer le mot de passe</label>
+                <label htmlFor="">Veuillez entrer le nouveau mot de passe</label>
                 <div className="relative w-[120%] mt-1">
                   <input
                     type={show ? "text" : "password"}

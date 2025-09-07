@@ -13,6 +13,7 @@ import NewPassword from "./Account/NewPassword";
 import Chemise from "./pages/Chemise";
 import Document from "./pages/Document";
 import Parametre from "./pages/Parametre";
+import EditService from "./pages/EditService";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -45,6 +46,7 @@ function App() {
         <Route path="/chemise" element={<Chemise />} />
         <Route path="/document" element={<Document />} />
         <Route path="/parametre" element={<Parametre />} />
+        <Route path="/editService" element={<EditService />} />
       </Routes>
     </>
   );
