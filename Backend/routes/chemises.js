@@ -181,10 +181,8 @@ router.delete("/:id", authenticateToken, (req, res) => {
 
     // Get chemise info before deletion
     const chemise = db.prepare(`
-      SELECT c.*, b.bureau_name, s.service_name 
+      SELECT c.*
       FROM chemises c 
-      JOIN bureaus b ON c.bureau_id = b.id_bureau 
-      JOIN services s ON b.service_id = s.id_service 
       WHERE c.id_chemise = ?
     `).get(id);
     
