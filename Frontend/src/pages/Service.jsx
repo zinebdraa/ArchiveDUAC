@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate, remove Navigate
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
@@ -8,7 +8,7 @@ import { IoAddCircleOutline } from "react-icons/io5";
 import { CiCircleInfo } from "react-icons/ci";
 
 const Service = () => {
-  const navigate = useNavigate(); // Use the navigate hook
+  const navigate = useNavigate();
   const [results, setResults] = useState([]);
 
   const handleSearch = (query) => {
@@ -23,7 +23,7 @@ const Service = () => {
   };
 
   const handleAddService = () => {
-    navigate("/addPage?type=service"); // Use navigate function, not Navigate component
+    navigate("/addPage?type=service");
   };
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const Service = () => {
         });
 
         console.log("API response:", response.data);
-        // 👇 use response.data directly (it's an array)
+
         setResults(response.data || []);
       } catch (error) {
         console.error("Error fetching services:", error);
@@ -62,8 +62,9 @@ const Service = () => {
                     key={service.id_service}
                     className="flex justify-center relative items-center text-center border-2 border-primary-green rounded-lg hover:text-white hover:bg-primary-green"
                   >
-                    <Link 
-                      to="/editService"
+                    <Link
+                      // to="/editService"
+                      to={`/editService/${service.id_service}`}
                       className="absolute left-3 top-[20px] -translate-y-1/2 z-10"
                     >
                       <CiCircleInfo className="hover:scale-110 transition-transform" />

@@ -14,6 +14,7 @@ import Chemise from "./pages/Chemise";
 import Document from "./pages/Document";
 import Parametre from "./pages/Parametre";
 import EditService from "./pages/EditService";
+import EditBureau from "./pages/EditBureau";
 
 function App() {
   const [pong, setPong] = useState("");
@@ -38,15 +39,19 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/services" element={<Service />} />
+        <Route path="/editService/:serviceId" element={<EditService />} />
         <Route path="/bureaux" element={<Bureaux />} />
+        <Route path="/editBureau/:bureauId" element={<EditBureau />} />
         <Route path="/bureaux/:serviceId" element={<Bureaux />} />
         <Route path="/addPage" element={<AddPage />} />
         <Route path="/resetPassword" element={<ResetPassword />} />
         <Route path="/newPassword" element={<NewPassword />} />
         <Route path="/chemise" element={<Chemise />} />
+        <Route path="/chemise/:bureauId" element={<Chemise  />} />
         <Route path="/document" element={<Document />} />
         <Route path="/parametre" element={<Parametre />} />
-        <Route path="/editService" element={<EditService />} />
+        {/* <Route path="/editService" element={<EditService />} /> */}
+        
       </Routes>
     </>
   );

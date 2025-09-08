@@ -24,9 +24,8 @@ router.get("/:id", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
     const bureau = db.prepare(`
-      SELECT b.*, s.service_name 
+      SELECT b.*
       FROM bureaus b 
-      JOIN services s ON b.id_service = s.id_service 
       WHERE b.id_bureau = ?
     `).get(id);
     
@@ -176,9 +175,8 @@ router.delete("/:id", authenticateToken, (req, res) => {
 
     // Get bureau info before deletion
     const bureau = db.prepare(`
-      SELECT b.*, s.service_name 
-      FROM bureaus b 
-      JOIN services s ON b.id_service = s.id_service 
+      SELECT b.*
+      FROM bureaus b  
       WHERE b.id_bureau = ?
     `).get(id);
     

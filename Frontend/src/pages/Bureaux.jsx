@@ -4,6 +4,7 @@ import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import axios from "axios";
 import { CgAddR, CgCornerDownLeft } from "react-icons/cg";
+import { CiCircleInfo } from "react-icons/ci";
 
 const Bureaux = () => {
   const navigate = useNavigate();
@@ -129,11 +130,19 @@ const Bureaux = () => {
                 {results.map((bureau) => (
                   <li
                     key={bureau.id_bureau ?? bureau.id}
-                    className="flex justify-center items-center text-center border-2 border-primary-green rounded-lg bg-green-4 hover:bg-primary-green hover:text-green-4"
+                    className="relative flex justify-center items-center text-center border-2 border-primary-green rounded-lg bg-green-4 hover:bg-primary-green hover:text-green-4"
                   >
                     {/* Add a proper 'to' if you want this to navigate */}
                     <Link
-                      to={`/chemise`}
+                      // to="/editService"
+                      to={`/editBureau/${bureau.id_bureau}`}
+                      className="absolute left-3 top-[20px] -translate-y-1/2 z-10"
+                    >
+                      <CiCircleInfo className="hover:scale-110 transition-transform" />
+                    </Link>
+                    <Link
+                      // to={`/chemise`}
+                      to={`/chemise/${bureau.id_bureau}`}
                       className="size-full flex justify-center items-center"
                     >
                       <p>{bureau.bureau_name}</p>

@@ -1,5 +1,5 @@
 // AddDoc.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Combobox } from "@headlessui/react";
 import { FaCheck } from "react-icons/fa";
@@ -25,6 +25,8 @@ const AddDoc = () => {
   const [dCreatedDate, setCreation] = useState("");
   const [errCreation, setErrCreation] = useState("");
   const [dDescription, setDescription] = useState("");
+  const [document, setFile] = useState(null);
+  const [errFile, setErrFile] = useState("");
 
   const [selectedService, setSelectedService] = useState(null);
   const [errSelectedService, setErrSelectedService] = useState("");
@@ -36,6 +38,7 @@ const AddDoc = () => {
   const [serviceQuery, setServiceQuery] = useState("");
   const [bureauQuery, setBureauQuery] = useState("");
   const [chemiseQuery, setChemiseQuery] = useState("");
+  const fileInputRef = useRef(null);
 
   // Fetching Data
   useEffect(() => {
@@ -143,15 +146,15 @@ const AddDoc = () => {
         );
 
   const chemisesOfBureau = selectedBureau
-  ? chemises.filter((c) => c.bureau_id === selectedBureau.id_bureau)
-  : [];
+    ? chemises.filter((c) => c.bureau_id === selectedBureau.id_bureau)
+    : [];
 
-const filteredChemises =
-  chemiseQuery === ""
-    ? chemisesOfBureau
-    : chemisesOfBureau.filter((c) =>
-        c.chemise_name.toLowerCase().includes(chemiseQuery.toLowerCase())
-      );
+  const filteredChemises =
+    chemiseQuery === ""
+      ? chemisesOfBureau
+      : chemisesOfBureau.filter((c) =>
+          c.chemise_name.toLowerCase().includes(chemiseQuery.toLowerCase())
+        );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -164,42 +167,32 @@ const filteredChemises =
       setErrPlacement("Merci d'entrer le placement du document");
     if (!dCreatedDate)
       setErrCreation("Merci d'entrer la date de création du document");
+    if (!document) setErrFile("Merci d'entrer le document");
 
-    // if (
-    //   name &&
-    //   placement &&
-    //   creation &&
-    //   selectedService &&
-    //   selectedBureau &&
-    //   selectedChemise
-    // ) {
-    //   console.log("✅ Success", {
-    //     name,
-    //     placement,
-    //     creation,
-    //     description,
-    //     service: selectedService,
-    //     bureau: selectedBureau,
-    //     chemise: selectedChemise,
-    //   });
-    //   clearForm();
-    // }
+    const formData = new FormData();
+    formData.append("document_name", document_name);
+    formData.append("document_place", document_place);
+    formData.append("dCreatedDate", dCreatedDate);
+    formData.append("dDescription", dDescription);
+    formData.append("chemise_name", selectedChemise.chemise_name);
+    formData.append("document", document);
+
     setLoading(true);
     try {
       const response = await axios.post(
         "http://localhost:3001/api/documents/upload",
-        {
-          document_name,
-          document_place,
-          dCreatedDate,
-          dDescription,
-          service_id: selectedService.id_service,
-          bureau_id: selectedBureau.id_bureau,
-          chemise_id: selectedChemise.id_chemise,
-        },
+        // {
+        //   document_name,
+        //   document_place,
+        //   dCreatedDate,
+        //   dDescription,
+        //   document,
+        //   chemise_name: selectedChemise.chemise_name,
+        // },
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
+            // "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -218,6 +211,7 @@ const filteredChemises =
     }
   };
 
+  
   const clearForm = () => {
     setName("");
     setErrName("");
@@ -232,6 +226,10 @@ const filteredChemises =
     setServiceQuery("");
     setBureauQuery("");
     setChemiseQuery("");
+    setFile(null); // ✅ Add this
+    setErrFile(""); // ✅ Add this
+
+   
   };
 
   return (
@@ -247,7 +245,7 @@ const filteredChemises =
               value={selectedService}
               onChange={(s) => {
                 setSelectedService(s);
-                setErrSelectedService(""); // ✅ clear error on select
+                setErrSelectedService(""); // clear error on select
                 setSelectedBureau(null);
                 setSelectedChemise(null);
               }}
@@ -331,7 +329,7 @@ const filteredChemises =
                 value={selectedBureau}
                 onChange={(b) => {
                   setSelectedBureau(b);
-                  setErrSelectedBureau(""); // ✅ clear error on select
+                  setErrSelectedBureau(""); // clear error on select
                   setSelectedChemise(null);
                 }}
               >
@@ -573,6 +571,26 @@ const filteredChemises =
             onChange={(e) => setDescription(e.target.value)}
             className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
           />
+        </div>
+        <div className="flex items-center">
+          <label htmlFor="description" className="font-medium mr-10">
+            Le fichier <span className="text-red-500">*</span>:
+          </label>
+          {/* <input
+            type="file"
+            id="file-input"
+            placeholder="Veuillez entrer le document"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
+          /> */}
+          <input
+            type="file"
+            ref={fileInputRef} // Use ref instead of id
+            placeholder="Veuillez entrer le document"
+            onChange={(e) => setFile(e.target.files[0])}
+            className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
+          />
+          {errFile && <p className="text-red-500 text-xs">{errFile}</p>}
         </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}

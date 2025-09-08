@@ -52,14 +52,15 @@ const createTables = db.transaction(() => {
   db.prepare(`
     CREATE TABLE IF NOT EXISTS documents (
       id_document INTEGER PRIMARY KEY AUTOINCREMENT,
-      document_titre TEXT NOT NULL,
-      file_path TEXT NOT NULL,  
-      file_type TEXT, 
-      file_size INTEGER,
-      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      document_name TEXT NOT NULL,
+      document_place TEXT NOT NULL,
+      dDescription TEXT,
+      dCreatedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+      document_type TEXT NOT NULL, 
+      document_data BLOB, 
       chemise_id INTEGER NOT NULL,
       FOREIGN KEY (chemise_id) REFERENCES chemises (id_chemise) ON DELETE CASCADE,
-      CHECK (file_type IN ('pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'xls', 'xlsx', 'ppt', 'pptx'))
+      CHECK (document_type IN ('pdf', 'doc', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'gif', 'xls', 'xlsx', 'ppt', 'pptx'))
     )
   `).run();
 
@@ -67,6 +68,7 @@ const createTables = db.transaction(() => {
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_bureaus_service_id ON bureaus(service_id)`).run();
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_chemises_bureau_id ON chemises(bureau_id)`).run();
   db.prepare(`CREATE INDEX IF NOT EXISTS idx_documents_chemise_id ON documents(chemise_id)`).run();
+  db.prepare(`CREATE INDEX IF NOT EXISTS idx_documents_document_type ON documents(document_type)`).run();
 });
 
 createTables();

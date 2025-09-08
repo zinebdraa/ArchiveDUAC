@@ -15,7 +15,7 @@ router.get("/", authenticateToken, (req, res) => {
   }
 });
 
-/* Get a single service by ID                               //would only be useful if: You wanted to display service details in a separate view
+// Get a single service by ID  
 router.get("/:id", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
@@ -30,7 +30,7 @@ router.get("/:id", authenticateToken, (req, res) => {
     console.error("Error fetching service:", error);
     res.status(500).json({ error: "Failed to fetch service" });
   }
-}); */
+}); 
 
 // Create new service
 router.post("/", authenticateToken, (req, res) => {
@@ -77,9 +77,9 @@ router.post("/", authenticateToken, (req, res) => {
 router.put("/:id", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { service_name, service_place, sDescription } = req.body;
+    const { service_name, service_place, sDescription, sCreatedDate } = req.body;
 
-    if (!service_name && !service_place && sDescription === undefined) {
+    if (!service_name && !service_place && sDescription && sCreatedDate === undefined) {
       return res.status(400).json({ error: "At least one field must be provided for update" });
     }
 
@@ -100,6 +100,11 @@ router.put("/:id", authenticateToken, (req, res) => {
     if (sDescription !== undefined) {
       updates.push("sDescription = ?");
       values.push(sDescription);
+    }
+
+    if (sCreatedDate !== undefined) {
+      updates.push("sCreatedDate = ?");
+      values.push(sCreatedDate);
     }
 
     values.push(id);
