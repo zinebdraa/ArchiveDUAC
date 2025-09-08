@@ -604,12 +604,12 @@ const Parametre = () => {
   };
 
   return (
-    <div className="grid grid-cols-4">
-      <div className="col-span-1">
+    <div className="grid grid-cols-4 h-screen">
+      <div className="col-span-1 h-screen">
         <SideBar />
       </div>
 
-      <div className="col-span-3">
+      <div className="col-span-3 overflow-y-auto">
         <div className="flex flex-col gap-4">
           <NavBare />
 

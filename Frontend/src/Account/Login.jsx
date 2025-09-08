@@ -79,7 +79,7 @@ function Login() {
         </div>
       </div>
 
-      <div className="h-screen flex justify-center items-center flex-col">
+      <div className="h-screen flex justify-center items-center flex-col overflow-y-auto">
         <form
           action=""
           className="flex justify-center items-center flex-col gap-16"

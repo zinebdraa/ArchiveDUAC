@@ -1,81 +1,79 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import { CgCornerDownLeft } from "react-icons/cg";
 
-const EditBureau = () => {
+const EditDocument = () => {
   const token = localStorage.getItem("token");
 
-  const { bureauId } = useParams();
+  const { documentId } = useParams();
   const navigate = useNavigate();
 
-  const [bureau, setService] = useState(null);
+  const [document, setDocument] = useState(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef(null);
 
   const [formValues, setFormValues] = useState({
-    bureau_name: "",
-    bureau_place: "",
-    bCreatedDate: "",
-    bDescription: "",
+    document_name: "",
+    document_place: "",
+    dCreatedDate: "",
+    dDescription: "",
+    document: null,
   });
 
-  // Fetch one bureau details
-  const fetchBureauDetails = async () => {
+  // Fetch one service details
+  const fetchDocumentDetails = async () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/bureaus/${bureauId}`,
+        `http://localhost:3001/api/documents/${documentId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Common patterns: response.data, response.data.service, response.data.data
       let svc = response.data;
 
-      // If response.data has a service property, use that
       if (response.data && response.data.service) {
         svc = response.data.service;
-      }
-      // If response.data has a data property, use that
-      else if (response.data && response.data.data) {
+      } else if (response.data && response.data.data) {
         svc = response.data.data;
       }
 
-      console.log("Extracted service:", svc);
+      console.log("Extracted documents:", svc);
 
       // Check if service exists and has expected properties
       if (!svc || (typeof svc === "object" && Object.keys(svc).length === 0)) {
-        setService(null);
-        setError("Service non trouvé.");
+        setDocument(null);
+        setError("document non trouvé.");
         return;
       }
 
-      setService(svc);
+      setDocument(svc);
 
       // Populate form with current service data
       setFormValues({
-        bureau_name: svc.bureau_name || "",
-        bureau_place: svc.bureau_place || "",
-        bCreatedDate: svc.bCreatedDate || "",
-        bDescription: svc.bDescription || "",
+        document_name: svc.document_name || "",
+        document_place: svc.document_place || "",
+        dCreatedDate: svc.dCreatedDate || "",
+        dDescription: svc.dDescription || "",
       });
 
       // Clear any previous errors
       setError("");
     } catch (error) {
-      console.error("Error fetching service details:", error);
+      console.error("Error fetching document details:", error);
       console.error("Error response:", error.response);
 
       if (error.response) {
         // Server responded with error status
         if (error.response.status === 404) {
-          setError("Service non trouvé.");
+          setError("Document non trouvé.");
         } else {
           setError(
             `Erreur du serveur: ${error.response.status} - ${
@@ -88,7 +86,7 @@ const EditBureau = () => {
         setError("Impossible de contacter le serveur.");
       } else {
         // Something else happened
-        setError("Erreur lors de la récupération du service.");
+        setError("Erreur lors de la récupération du document.");
       }
     } finally {
       setLoading(false);
@@ -111,7 +109,7 @@ const EditBureau = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:3001/api/bureaus/${bureauId}`,
+        `http://localhost:3001/api/documents/${documentId}`,
         { ...formValues },
         {
           headers: {
@@ -122,15 +120,15 @@ const EditBureau = () => {
       );
 
       if (response.status === 200) {
-        setSuccess("Service mis à jour avec succès !");
+        setSuccess("Document mis à jour avec succès !");
         setIsEditing(false);
-        await fetchBureauDetails();
+        await fetchDocumentDetails();
       }
 
       setTimeout(() => setSuccess(""), 4000);
     } catch (err) {
       console.error("Update error:", err);
-      setError("Impossible de mettre à jour le service. Réessayez plus tard.");
+      setError("Impossible de mettre à jour le document. Réessayez plus tard.");
       setTimeout(() => setError(""), 4000);
     } finally {
       setLoading(false);
@@ -141,12 +139,12 @@ const EditBureau = () => {
   };
 
   const handleCancel = () => {
-    if (bureau) {
+    if (document) {
       setFormValues({
-        bureau_name: bureau.bureau_name || "",
-        bureau_place: bureau.bureau_place || "",
-        bCreatedDate: bureau.bCreatedDate || "",
-        bDescription: bureau.bDescription || "",
+        document_name: document.document_name || "",
+        document_place: document.document_place || "",
+        dCreatedDate: document.dCreatedDate || "",
+        dDescription: document.dDescription || "",
       });
     }
     setIsEditing(false);
@@ -159,20 +157,23 @@ const EditBureau = () => {
   };
 
   useEffect(() => {
-    if (bureauId && token) {
-      fetchBureauDetails();
+    if (documentId && token) {
+      fetchDocumentDetails();
     } else {
-      console.log("Missing serviceId or token:", { bureauId, token: !!token });
+      console.log("Missing serviceId or token:", {
+        documentId,
+        token: !!token,
+      });
     }
-  }, [bureauId, token]);
+  }, [documentId, token]);
 
-  if (loading && !bureau) {
+  if (loading && !document) {
     return (
       <div className="grid grid-cols-4 min-h-screen">
         <div className="grid col-span-1">
           <SideBar />
         </div>
-        <div className="grid col-span-3">
+        <div className="grid col-span-3 overflow-y-auto">
           <div className="flex flex-col">
             <NavBare />
             <div className="m-auto p-8">
@@ -184,17 +185,19 @@ const EditBureau = () => {
     );
   }
 
-  if (!bureau && !loading) {
+  if (!document && !loading) {
     return (
       <div className="grid grid-cols-4 min-h-screen">
-        <div className="grid col-span-1">
+        <div className="grid col-span-1 h-screen">
           <SideBar />
         </div>
-        <div className="grid col-span-3">
+        <div className="grid col-span-3 overflow-y-auto">
           <div className="flex flex-col">
             <NavBare />
             <div className="m-auto p-8">
-              <div className="text-center text-red-600">Bureau non trouvé</div>
+              <div className="text-center text-red-600">
+                Document non trouvé
+              </div>
               <button
                 onClick={handleBack}
                 className="mt-4 px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
@@ -209,7 +212,7 @@ const EditBureau = () => {
   }
   return (
     <div className="grid grid-cols-4 min-h-screen">
-      <div className="grid col-span-1 h-screen">
+      <div className="grid col-span-1 h-screen ">
         <SideBar />
       </div>
       <div className="grid col-span-3 overflow-y-auto">
@@ -218,19 +221,19 @@ const EditBureau = () => {
           <div className="p-8 max-w-2xl mx-auto w-full">
             {/* Header */}
             <div className="flex justify-start items-center my-auto ml-[-50px] mb-[50px]">
-              {bureauId && (
+              {documentId && (
                 <button onClick={() => navigate(-1)}>
                   <CgCornerDownLeft className="size-[30px] border-2 border-primary-green bg-green-4 text-primary-green" />
                 </button>
               )}
               <p className="ml-6 font-medium text-lg border-b-[1.5px] border-primary-green">
-                {bureauId
-                  ? bureau
-                    ? `Détails du bureau${
-                        bureau?.service_name ?? bureau?.name ?? ""
+                {documentId
+                  ? document
+                    ? `Détails du document ${
+                        document?.service_name ?? document?.name ?? ""
                       }`
-                    : "Détails du bureau"
-                  : "Détails du bureau"}
+                    : "Détails du document"
+                  : "Détails du document"}
               </p>
             </div>
 
@@ -247,15 +250,15 @@ const EditBureau = () => {
               <div className="space-y-4">
                 <div className="flex items-center">
                   <label
-                    htmlFor="bureau_name"
+                    htmlFor="service_name"
                     className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
                   >
-                    Nom du Bureau :
+                    Nom :
                   </label>
                   <input
                     type="text"
-                    id="bureau_name"
-                    value={formValues.bureau_name}
+                    id="service_name"
+                    value={formValues.document_name}
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${
@@ -266,15 +269,15 @@ const EditBureau = () => {
 
                 <div className="flex items-center">
                   <label
-                    htmlFor="bureau_place"
+                    htmlFor="service_place"
                     className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
                   >
                     Archivé dans :
                   </label>
                   <input
                     type="text"
-                    id="bureau_place"
-                    value={formValues.bureau_place}
+                    id="service_place"
+                    value={formValues.document_place}
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${
@@ -283,7 +286,7 @@ const EditBureau = () => {
                   />
                 </div>
 
-                <div className="flex items-center">
+                <div className="flex">
                   <label
                     htmlFor="sCreatedDate"
                     className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
@@ -292,8 +295,8 @@ const EditBureau = () => {
                   </label>
                   <input
                     type="date"
-                    id="bCreatedDate"
-                    value={formValues.bCreatedDate}
+                    id="sCreatedDate"
+                    value={formValues.dCreatedDate}
                     onChange={handleChange}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${
@@ -310,9 +313,29 @@ const EditBureau = () => {
                     Description :
                   </label>
                   <textarea
-                    id="bDescription"
-                    value={formValues.bDescription}
+                    id="sDescription"
+                    value={formValues.dDescription}
                     onChange={handleChange}
+                    disabled={!isEditing}
+                    rows="4"
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${
+                      !isEditing ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                  />
+                </div>
+
+                <div className="flex items-center">
+                  <label
+                    htmlFor="sDescription"
+                    className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
+                  >
+                    File :
+                  </label>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    
+                    onChange={(e) => setDocument(e.target.files[0])}
                     disabled={!isEditing}
                     rows="4"
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${
@@ -337,7 +360,7 @@ const EditBureau = () => {
                     <button
                       type="button"
                       onClick={handleCancel}
-                      className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      className="px-6 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors "
                     >
                       Annuler
                     </button>
@@ -359,4 +382,4 @@ const EditBureau = () => {
   );
 };
 
-export default EditBureau;
+export default EditDocument;

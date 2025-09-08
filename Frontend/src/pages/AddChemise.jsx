@@ -518,14 +518,17 @@ const AddChemise = () => {
         clearForm();
       }
       setTimeout(() => {
-          setSuccess("");
-        }, 4000);
+        setSuccess("");
+      }, 4000);
     } catch (err) {
       console.error("Add Chemise error:", err);
       setError("Impossible d'ajouter la chemise. Réessayez plus tard.");
     } finally {
       setLoading(false);
     }
+    setTimeout(() => {
+      setError("");
+    }, 6000);
   };
 
   const clearForm = () => {

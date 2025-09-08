@@ -10,7 +10,7 @@ const AddService = () => {
   const [sCreatedDate, setCreation] = useState("");
   const [errCreation, setErrCreation] = useState("");
   const [sDescription, setDescription] = useState("");
-  const [error, setError] = useState(""); 
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -53,14 +53,18 @@ const AddService = () => {
       }
 
       setTimeout(() => {
-          setSuccess("");
-        }, 4000);
+        setSuccess("");
+      }, 4000);
     } catch (err) {
       console.error("Add service error:", err);
       setError("Impossible d’ajouter le service. Réessayez plus tard.");
     } finally {
       setLoading(false);
     }
+
+    setTimeout(() => {
+        setError("");
+      }, 6000);
   };
 
   const clearForm = () => {

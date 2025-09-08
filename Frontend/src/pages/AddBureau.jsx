@@ -261,7 +261,7 @@ import { HiMiniChevronUpDown } from "react-icons/hi2";
 const AddBureau = () => {
   const token = localStorage.getItem("token");
 
-  const [services, setServices] = useState([]); 
+  const [services, setServices] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -352,14 +352,18 @@ const AddBureau = () => {
         clearForm();
       }
       setTimeout(() => {
-          setSuccess("");
-        }, 4000);
+        setSuccess("");
+      }, 4000);
     } catch (err) {
       console.error("Add Bureau error:", err);
       setError("Impossible d’ajouter Bureau. Réessayez plus tard.");
     } finally {
       setLoading(false);
     }
+
+    setTimeout(() => {
+      setError("");
+    }, 6000);
   };
 
   const clearForm = () => {
@@ -445,13 +449,12 @@ const AddBureau = () => {
           )}
         </div>
 
-        
-          {/* Bureau Name */}
+        {/* Bureau Name */}
         <div>
-           <label htmlFor="name" className="font-medium mr-20">
-             Nom <span className="text-red-500">*</span> :
-           </label>
-           <input
+          <label htmlFor="name" className="font-medium mr-20">
+            Nom <span className="text-red-500">*</span> :
+          </label>
+          <input
             type="text"
             id="name"
             value={bureau_name}
@@ -507,7 +510,7 @@ const AddBureau = () => {
             onChange={handleDescriptionChange}
             className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
           />
-        </div> 
+        </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
         {success && <p className="text-secondary-green text-sm">{success}</p>}

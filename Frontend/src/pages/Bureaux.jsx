@@ -84,7 +84,6 @@ const Bureaux = () => {
   useEffect(() => {
     fetchBureaux();
     fetchService();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceId]);
 
   // Re-apply filters when raw data or search changes
@@ -92,7 +91,6 @@ const Bureaux = () => {
     setResults(applyFilters(bureaux, search, serviceId));
   }, [bureaux, search, serviceId]);
 
-  // NavBare should call onSearch with the text; we keep it simple
   const handleSearch = (query) => setSearch(query ?? "");
 
   const handleAddBureau = () => {
@@ -100,11 +98,11 @@ const Bureaux = () => {
   };
 
   return (
-    <div className="grid grid-cols-4">
-      <div className="grid col-span-1">
+    <div className="grid grid-cols-4 h-screen">
+      <div className="grid col-span-1 h-screen">
         <SideBar />
       </div>
-      <div className="grid col-span-3">
+      <div className="grid col-span-3 overflow-y-auto">
         <div className="flex flex-col">
           <NavBare onSearch={handleSearch} />
           <div className="flex justify-start items-center my-auto ml-8">
@@ -132,16 +130,13 @@ const Bureaux = () => {
                     key={bureau.id_bureau ?? bureau.id}
                     className="relative flex justify-center items-center text-center border-2 border-primary-green rounded-lg bg-green-4 hover:bg-primary-green hover:text-green-4"
                   >
-                    {/* Add a proper 'to' if you want this to navigate */}
                     <Link
-                      // to="/editService"
                       to={`/editBureau/${bureau.id_bureau}`}
                       className="absolute left-3 top-[20px] -translate-y-1/2 z-10"
                     >
                       <CiCircleInfo className="hover:scale-110 transition-transform" />
                     </Link>
                     <Link
-                      // to={`/chemise`}
                       to={`/chemise/${bureau.id_bureau}`}
                       className="size-full flex justify-center items-center"
                     >
@@ -161,9 +156,20 @@ const Bureaux = () => {
                 </li>
               </ul>
             ) : (
-              <p className="mt-2 text-red-500 font-normal">
-                Aucun résultat trouvé
-              </p>
+              <div>
+                <p className="mt-2 text-red-500 font-normal">
+                  Aucun résultat trouvé
+                </p>
+                <div className="p-4 flex justify-center items-center text-center border-2 border-primary-green rounded-lg bg-green-4 hover:bg-primary-green hover:text-green-4">
+                  <button
+                    className="size-full flex justify-center items-center m-auto"
+                    onClick={handleAddBureau}
+                  >
+                    <CgAddR className="size-[30px] mr-3 font-thin" />
+                    <p>Ajouter un Bureau</p>
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

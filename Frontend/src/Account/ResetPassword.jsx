@@ -9,6 +9,12 @@ const ResetPassword = () => {
   const [errEmail, setErrEmail] = useState("");
   const [user_num, setPhone] = useState("");
   const [errPhone, setErrPhone] = useState("");
+  const [new_password, setPassword] = useState("");
+  const [errPassword, setErrPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errConfirmPassword, setErrConfirmPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const navigate = useNavigate();
@@ -32,6 +38,23 @@ const ResetPassword = () => {
     return /^(?:0[0-9]{9}|\+213[0-9]{9})$/.test(String(phone));
   };
 
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    setErrPassword("");
+  };
+  const handleConfirmPasswordChange = (e) => {
+    setConfirmPassword(e.target.value);
+    setErrConfirmPassword("");
+  };
+
+  const ConfirmPasswordValidation = (confirmPassword) => {
+    if (confirmPassword === new_password) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     let valid = true;
@@ -43,6 +66,7 @@ const ResetPassword = () => {
       setErrEmail("Merci d'entrer un email valide");
       valid = false;
     }
+
     if (!user_num) {
       setErrPhone("Merci d'entrer votre numero de telephone");
       valid = false;
@@ -51,17 +75,32 @@ const ResetPassword = () => {
       valid = false;
     }
 
+    if (!new_password.trim()) {
+      setErrPassword("Merci d'entrer votre mot de passe");
+      valid = false;
+    }
+    if (new_password.trim().length < 8) {
+      setErrPassword("le mot de passe doit contenir plus de 8 caractères");
+      valid = false;
+    }
+    if (!confirmPassword.trim()) {
+      setErrConfirmPassword("Merci de confirmer votre mot de passe");
+      valid = false;
+    }
+    if (!ConfirmPasswordValidation(confirmPassword)) {
+      setErrPassword("Les mots de passe ne correspondent pas");
+      setErrConfirmPassword("Les mots de passe ne correspondent pas");
+      valid = false;
+    }
+
     if (!valid) return;
 
     setLoading(true);
-    // if (email && phone && emailValidation(email) && phoneValidation(phone)) {
-    //   console.log("success");
-    //   navigate("/newPassword");
-    // }
+
     try {
       const response = await axios.put(
         "http://localhost:3001/api/users/forgot-password",
-        { user_email, user_num },
+        { user_email, user_num, new_password },
         {
           headers: {
             "Content-Type": "application/json",
@@ -70,7 +109,7 @@ const ResetPassword = () => {
       );
 
       if (response.status === 200) {
-        navigate("/newPassword");
+        navigate("/Login");
         clearForm();
       }
     } catch (err) {
@@ -94,6 +133,10 @@ const ResetPassword = () => {
     setErrEmail("");
     setErrPhone("");
     setPhone("");
+    setErrConfirmPassword("");
+    setConfirmPassword("");
+    setErrPassword("");
+    setPassword("");
   };
 
   return (
@@ -109,7 +152,7 @@ const ResetPassword = () => {
         </div>
       </div>
 
-      <div className="h-screen flex justify-center items-center flex-col">
+      <div className="h-screen flex justify-center items-center flex-col overflow-y-auto">
         <form
           action=""
           className="flex justify-center items-center flex-col gap-16"
@@ -150,15 +193,81 @@ const ResetPassword = () => {
 
               {errPhone && <p className="text-red-500 text-xs">{errPhone}</p>}
             </div>
+
+            <div className="">
+              <div className=" w-[100%] my-5">
+                <label htmlFor="">
+                  Veuillez entrer le nouveau mot de passe
+                </label>
+                <div className="relative w-[120%] mt-1">
+                  <input
+                    type={show ? "text" : "password"}
+                    className=" border-2 border-primary-green rounded-[8px] w-[100%] h-[40px] p-[15px] pl-[40px]"
+                    placeholder="mot de passe"
+                    value={new_password}
+                    onChange={handlePasswordChange}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShow(!show)}
+                    disabled={loading}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 "
+                  >
+                    {show ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+                  </button>
+                </div>
+                {errPassword && (
+                  <p className="text-red-500 text-xs">{errPassword}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="">
+              <div className=" w-[100%]">
+                <label htmlFor="">Veuillez confirmer le mot de passe</label>
+                <div className="relative w-[120%] mt-1">
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    className=" border-2 border-primary-green rounded-[8px] w-[100%] h-[40px] p-[15px] pl-[40px]"
+                    placeholder="Confirmer le mot de passe"
+                    value={confirmPassword}
+                    onChange={handleConfirmPasswordChange}
+                    disabled={loading}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    disabled={loading}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 "
+                  >
+                    {showConfirm ? <AiOutlineEye /> : <AiOutlineEyeInvisible />}
+                  </button>
+                </div>
+                {errConfirmPassword && (
+                  <p className="text-red-500 text-xs">{errConfirmPassword}</p>
+                )}
+              </div>
+            </div>
           </div>
           {err && <p className="text-red-500 text-sm">{err}</p>}
-          <button
-            type="submit"
-            className="rounded-xl bg-primary-green text-white shadow-2xl font-bold px-7 py-2"
-            disabled={loading}
-          >
-            {loading ? "Connexion..." : "Next"}
-          </button>
+          <div className="flex justify-between gap-3">
+            <button
+              type=""
+              className="rounded-xl bg-gray-500 text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors  shadow-2xl font-bold px-7 py-2"
+              disabled={loading}
+              onClick={() => navigate(-1)}
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="rounded-xl bg-primary-green hover:bg-secondary-green text-white shadow-2xl font-bold px-7 py-2"
+              disabled={loading}
+            >
+              {loading ? "Connexion..." : "Next"}
+            </button>
+          </div>
         </form>
       </div>
     </div>

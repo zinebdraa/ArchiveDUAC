@@ -39,7 +39,7 @@ const Service = () => {
         setResults(response.data || []);
       } catch (error) {
         console.error("Error fetching services:", error);
-        setResults([]); // fallback to empty
+        setResults([]);
       }
     };
 
@@ -47,11 +47,11 @@ const Service = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-4">
-      <div className="grid col-span-1">
+    <div className="grid grid-cols-4 h-screen">
+      <div className="grid col-span-1 h-screen">
         <SideBar />
       </div>
-      <div className="grid col-span-3">
+      <div className="grid col-span-3 overflow-y-auto">
         <div className="flex flex-col">
           <NavBare onSearch={handleSearch} />
           <div className="flex justify-center items-center h-[60%] w-[80%] m-auto">
@@ -63,7 +63,6 @@ const Service = () => {
                     className="flex justify-center relative items-center text-center border-2 border-primary-green rounded-lg hover:text-white hover:bg-primary-green"
                   >
                     <Link
-                      // to="/editService"
                       to={`/editService/${service.id_service}`}
                       className="absolute left-3 top-[20px] -translate-y-1/2 z-10"
                     >
@@ -88,9 +87,20 @@ const Service = () => {
                 </li>
               </ul>
             ) : (
-              <p className="mt-2 text-red-500 font-medium">
-                Aucun résultat trouvé
-              </p>
+              <div>
+                <p className="mt-2 text-red-500 font-medium">
+                  Aucun résultat trouvé
+                </p>
+                <div className="p-4 flex justify-center items-center text-center hover:border-2 hover:border-primary-green hover:rounded-lg">
+                  <button
+                    onClick={handleAddService}
+                    className="size-full flex justify-center items-center flex-col hover:bg-gray-50 transition-colors duration-200"
+                  >
+                    <IoAddCircleOutline className="size-[40px] mx-auto mb-5" />
+                    <p>Ajouter un Service</p>
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         </div>

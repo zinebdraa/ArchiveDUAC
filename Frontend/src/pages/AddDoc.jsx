@@ -1,4 +1,3 @@
-// AddDoc.jsx
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { Combobox } from "@headlessui/react";
@@ -48,18 +47,18 @@ const AddDoc = () => {
   // Fetch bureaux when a service is selected
   useEffect(() => {
     if (selectedService) {
-      fetchBureaux(selectedService.id_service); // pass the service ID
+      fetchBureaux(selectedService.id_service);
     } else {
-      setBureaux([]); // reset when no service is selected
+      setBureaux([]);
     }
   }, [selectedService]);
 
   // Fetch chemise when a bureau is selected
   useEffect(() => {
     if (selectedBureau) {
-      fetchChemises(selectedBureau.id_bureau); // pass the service ID
+      fetchChemises(selectedBureau.id_bureau);
     } else {
-      setChemises([]); // reset when no service is selected
+      setChemises([]); 
     }
   }, [selectedBureau]);
 
@@ -181,18 +180,9 @@ const AddDoc = () => {
     try {
       const response = await axios.post(
         "http://localhost:3001/api/documents/upload",
-        // {
-        //   document_name,
-        //   document_place,
-        //   dCreatedDate,
-        //   dDescription,
-        //   document,
-        //   chemise_name: selectedChemise.chemise_name,
-        // },
         formData,
         {
           headers: {
-            // "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         }
@@ -203,15 +193,21 @@ const AddDoc = () => {
         setSuccess("Documment ajoutée avec succès !");
         clearForm();
       }
+      setTimeout(() => {
+        setSuccess("");
+      }, 4000);
     } catch (err) {
       console.error("Add Documment error:", err);
       setError("Impossible d'ajouter le documment. Réessayez plus tard.");
     } finally {
       setLoading(false);
     }
+
+    setTimeout(() => {
+      setError("");
+    }, 6000);
   };
 
-  
   const clearForm = () => {
     setName("");
     setErrName("");
@@ -226,10 +222,12 @@ const AddDoc = () => {
     setServiceQuery("");
     setBureauQuery("");
     setChemiseQuery("");
-    setFile(null); // ✅ Add this
-    setErrFile(""); // ✅ Add this
+    setFile(null);
+    setErrFile("");
 
-   
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -512,7 +510,7 @@ const AddDoc = () => {
             value={document_name}
             onChange={(e) => {
               setName(e.target.value);
-              setErrName(""); // ✅ clear error on typing
+              setErrName("");
             }}
             placeholder="Entrez le nom du document"
             className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
@@ -531,7 +529,7 @@ const AddDoc = () => {
             value={document_place}
             onChange={(e) => {
               setPlacement(e.target.value);
-              setErrPlacement(""); // ✅ clear error on typing
+              setErrPlacement("");
             }}
             placeholder="Entrez son emplacement"
             className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
@@ -552,7 +550,7 @@ const AddDoc = () => {
             value={dCreatedDate}
             onChange={(e) => {
               setCreation(e.target.value);
-              setErrCreation(""); // ✅ clear error on typing
+              setErrCreation("");
             }}
             className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
           />
@@ -585,7 +583,7 @@ const AddDoc = () => {
           /> */}
           <input
             type="file"
-            ref={fileInputRef} // Use ref instead of id
+            ref={fileInputRef}
             placeholder="Veuillez entrer le document"
             onChange={(e) => setFile(e.target.files[0])}
             className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"

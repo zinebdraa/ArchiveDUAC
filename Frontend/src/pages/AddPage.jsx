@@ -26,29 +26,25 @@ const AddPage = () => {
   // Extract type and source from query params
   const params = new URLSearchParams(location.search);
   const initialType = params.get("type") || "";
-  const source = params.get("source") || ""; // New parameter to identify source page
+  const source = params.get("source") || "";
 
   const [selectedType, setSelectedType] = useState(
     types.find((t) => t.value === initialType) || null
   );
   const [query, setQuery] = useState("");
 
-  // Determine if we came from "ajouter" or from a specific page
-  // const cameFromAjouter = source === "ajouter";
   const cameFromAjouter = source === "ajouter" || (!source && !initialType);
   const isLocked = Boolean(initialType) && !cameFromAjouter;
 
   // Filter types based on the scenario
   const getAvailableTypes = () => {
     if (cameFromAjouter) {
-      // Show all types when coming from "ajouter"
       return query === ""
         ? types
         : types.filter((t) =>
             t.label.toLowerCase().includes(query.toLowerCase())
           );
     } else if (initialType) {
-      // Show only the specific type when coming from another page
       return types.filter((t) => t.value === initialType);
     }
     return types;
@@ -59,7 +55,6 @@ const AddPage = () => {
   // Handle back navigation
   const handleGoBack = () => {
     if (!cameFromAjouter) {
-      // Go back to the actual previous page in browser history
       navigate(-1);
     }
   };
@@ -81,11 +76,11 @@ const AddPage = () => {
   };
 
   return (
-    <div className="grid grid-cols-4">
-      <div className="grid col-span-1">
+    <div className="grid grid-cols-4 h-screen">
+      <div className="grid col-span-1 h-screen">
         <SideBar />
       </div>
-      <div className="grid col-span-3">
+      <div className="grid col-span-3 overflow-y-auto">
         <div className="flex flex-col">
           <NavBare />
           <div className="w-full flex justify-center items-center m-auto">
