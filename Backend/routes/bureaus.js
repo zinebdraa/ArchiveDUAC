@@ -48,14 +48,6 @@ router.post("/", authenticateToken, (req, res) => {
     if (!bureau_name || !bureau_place || !service_name || !bCreatedDate) {
       return res.status(400).json({ error: "Bureau name, place, date and service name are required" });
     }
-
-    // // Validate the format 
-    // const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-    // if (!dateRegex.test(bCreatedDate)) {
-    //   return res.status(400).json({
-    //     error: "Date must be in DD-MM-YYYY format"
-    //   })
-    // }
     
     // Find service by name to get the ID
     const service = db.prepare("SELECT * FROM services WHERE service_name = ?").get(service_name);

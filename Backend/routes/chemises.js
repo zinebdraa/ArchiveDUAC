@@ -30,10 +30,8 @@ router.get("/:id", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
     const chemise = db.prepare(`
-      SELECT c.*, b.bureau_name, s.service_name 
+      SELECT c.*
       FROM chemises c 
-      JOIN bureaus b ON c.bureau_id = b.id_bureau 
-      JOIN services s ON b.service_id = s.id_service 
       WHERE c.id_chemise = ?
     `).get(id);
     
@@ -104,18 +102,10 @@ router.post("/", authenticateToken, (req, res) => {
 router.put("/:id", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
-    const { chemise_name, chemise_place, cDescription, bureau_id } = req.body;
+    const { chemise_name, chemise_place, cDescription, cCreatedDate } = req.body;
 
-    if (!chemise_name && !chemise_place && cDescription === undefined && !bureau_id) {
+    if (!chemise_name && !chemise_place && cDescription === undefined && !cCreatedDate) {
       return res.status(400).json({ error: "At least one field must be provided for update" });
-    }
-
-    // If bureau_id is provided, check if bureau exists
-    if (bureau_id) {
-      const bureau = db.prepare("SELECT * FROM bureaus WHERE id_bureau = ?").get(bureau_id);
-      if (!bureau) {
-        return res.status(400).json({ error: "Bureau not found" });
-      }
     }
 
     // Build update query dynamically
@@ -137,10 +127,15 @@ router.put("/:id", authenticateToken, (req, res) => {
       values.push(cDescription);
     }
 
-    if (bureau_id) {
-      updates.push("bureau_id = ?");
-      values.push(bureau_id);
+    if (cCreatedDate !== undefined) {
+      updates.push("cCreatedDate = ?");
+      values.push(cCreatedDate);
     }
+
+    // if (bureau_id) {
+    //   updates.push("bureau_id = ?");
+    //   values.push(bureau_id);
+    // }
 
     values.push(id);
 
@@ -153,10 +148,8 @@ router.put("/:id", authenticateToken, (req, res) => {
 
     // Get updated chemise with bureau and service info
     const updatedChemise = db.prepare(`
-      SELECT c.*, b.bureau_name, s.service_name 
+      SELECT c.*
       FROM chemises c 
-      JOIN bureaus b ON c.bureau_id = b.id_bureau 
-      JOIN services s ON b.service_id = s.id_service 
       WHERE c.id_chemise = ?
     `).get(id);
     
@@ -190,21 +183,6 @@ router.delete("/:id", authenticateToken, (req, res) => {
       return res.status(404).json({ error: "Chemise not found" });
     }
 
-    // Get all documents in this chemise to delete files
-    const documents = db.prepare("SELECT file_path FROM documents WHERE chemise_id = ?").all(id);
-    
-    // Delete physical files
-    documents.forEach(doc => {
-      const filePath = path.join(__dirname, '..', doc.file_path);
-      if (fs.existsSync(filePath)) {
-        try {
-          fs.unlinkSync(filePath);
-        } catch (fileError) {
-          console.error(`Error deleting file ${filePath}:`, fileError);
-        }
-      }
-    });
-
     // Delete chemise (cascade will handle related records)
     const result = db.prepare("DELETE FROM chemises WHERE id_chemise = ?").run(id);
 
@@ -230,10 +208,8 @@ router.get("/:id/documents", authenticateToken, (req, res) => {
     
     // Check if chemise exists and get chemise info
     const chemise = db.prepare(`
-      SELECT c.*, b.bureau_name, s.service_name 
+      SELECT c.*
       FROM chemises c 
-      JOIN bureaus b ON c.bureau_id = b.id_bureau 
-      JOIN services s ON b.service_id = s.id_service 
       WHERE c.id_chemise = ?
     `).get(id);
     
@@ -258,53 +234,48 @@ router.get("/:id/documents", authenticateToken, (req, res) => {
 router.get("/:id/download", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Get chemise info
     const chemise = db.prepare(`
-      SELECT c.*, b.bureau_name, s.service_name 
+      SELECT c.*
       FROM chemises c 
-      JOIN bureaus b ON c.bureau_id = b.id_bureau 
-      JOIN services s ON b.service_id = s.id_service 
       WHERE c.id_chemise = ?
     `).get(id);
-    
+
     if (!chemise) {
       return res.status(404).json({ error: "Chemise not found" });
     }
 
     // Get all documents in this chemise
     const documents = db.prepare("SELECT * FROM documents WHERE chemise_id = ?").all(id);
-    
+
     if (documents.length === 0) {
       return res.status(404).json({ error: "No documents found in this chemise" });
     }
 
     // Create ZIP archive
-    const archive = archiver('zip', { zlib: { level: 9 } });
-    const zipName = `${chemise.chemise_name.replace(/[^a-z0-9]/gi, '_')}_${Date.now()}.zip`;
+    const archive = archiver("zip", { zlib: { level: 9 } });
+    const zipName = `${chemise.chemise_name.replace(/[^a-z0-9_\-\.]/gi, "_")}_${Date.now()}.zip`;
 
     // Set response headers
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${zipName}"`);
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${zipName}"`);
 
     // Handle archive errors
-    archive.on('error', (err) => {
-      console.error('Archive error:', err);
+    archive.on("error", (err) => {
+      console.error("Archive error:", err);
       if (!res.headersSent) {
-        res.status(500).json({ error: 'Failed to create archive' });
+        res.status(500).json({ error: "Failed to create archive" });
       }
     });
 
     // Pipe archive to response
     archive.pipe(res);
 
-    // Add files to archive
-    documents.forEach(doc => {
-      const filePath = path.join(__dirname, '..', doc.file_path);
-      if (fs.existsSync(filePath)) {
-        const fileName = `${doc.document_titre}.${doc.file_type || 'file'}`;
-        archive.file(filePath, { name: fileName });
-      }
+    // Add each document (from DB BLOBs) to archive
+    documents.forEach((doc) => {
+      const safeName = `${doc.document_name.replace(/[^a-z0-9_\-\.]/gi, "_")}.${doc.document_type}`;
+      archive.append(Buffer.from(doc.document_data), { name: safeName });
     });
 
     // Add chemise info as a text file
@@ -313,18 +284,20 @@ Bureau: ${chemise.bureau_name}
 Service: ${chemise.service_name}
 Place: ${chemise.chemise_place}
 Created: ${chemise.cCreatedDate}
-Description: ${chemise.cDescription || 'N/A'}
+Description: ${chemise.cDescription || "N/A"}
 
 Documents (${documents.length}):
-${documents.map((doc, index) => 
-  `${index + 1}. ${doc.document_titre} (${doc.file_type}) - ${doc.created_at}`
-).join('\n')}`;
+${documents
+  .map(
+    (doc, i) =>
+      `${i + 1}. ${doc.document_name} (${doc.document_type}) - ${doc.dCreatedDate}`
+  )
+  .join("\n")}`;
 
-    archive.append(chemiseInfo, { name: 'chemise_info.txt' });
+    archive.append(chemiseInfo, { name: "chemise_info.txt" });
 
     // Finalize archive
     archive.finalize();
-
   } catch (error) {
     console.error("Error downloading chemise:", error);
     if (!res.headersSent) {
@@ -334,3 +307,4 @@ ${documents.map((doc, index) =>
 });
 
 module.exports = router;
+

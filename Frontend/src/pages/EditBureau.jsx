@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavBare from "../components/NavBare";
@@ -179,7 +179,7 @@ const EditBureau = () => {
 
   if (!bureau && !loading) {
     return (
-      <div className="grid grid-cols-4 min-h-screen">
+      <div className="grid grid-cols-4 h-screen">
         <div className="grid col-span-1">
           <SideBar />
         </div>
@@ -201,7 +201,7 @@ const EditBureau = () => {
     );
   }
   return (
-    <div className="grid grid-cols-4 min-h-screen">
+    <div className="grid grid-cols-4 h-screen">
       <div className="grid col-span-1 h-screen">
         <SideBar />
       </div>

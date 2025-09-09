@@ -53,9 +53,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Search endpoint across all entities
-app.get("/api/search", require("./routes/search"));
-
 // 404 handler for API routes
 app.use("/api/*", (req, res) => {
   res.status(404).json({

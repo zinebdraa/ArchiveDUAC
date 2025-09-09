@@ -57,6 +57,27 @@ router.get("/", authenticateToken, (req, res) => {
   }
 });
 
+// Get a single document by ID
+router.get("/:id", authenticateToken, (req, res) => {
+  try {
+    const { id } = req.params;
+    const document = db.prepare(`
+      SELECT d.*
+      FROM documents d 
+      WHERE d.id_document = ?
+    `).get(id);
+    
+    if (!document) {
+      return res.status(404).json({ error: "document not found" });
+    }
+    
+    res.json(document);
+  } catch (error) {
+    console.error("Error fetching document:", error);
+    res.status(500).json({ error: "Failed to fetch document" });
+  }
+});
+
 // Upload new document
 router.post("/upload", authenticateToken, upload.single('document'), async (req, res) => {
   try {
@@ -119,17 +140,6 @@ router.post("/upload", authenticateToken, upload.single('document'), async (req,
     console.error("Error uploading document:", error);
     if (req.file) fs.unlinkSync(req.file.path);
     res.status(500).json({ error: "Failed to upload document" });
-  }
-});
-
-// Get chemises
-router.get("/chemises", authenticateToken, (req, res) => {
-  try {
-    const chemises = db.prepare("SELECT id_chemise, chemise_name FROM chemises ORDER BY chemise_name").all();
-    res.json({ success: true, chemises });
-  } catch (error) {
-    console.error("Error fetching chemises:", error);
-    res.status(500).json({ success: false, error: "Failed to fetch chemises" });
   }
 });
 
@@ -205,16 +215,33 @@ router.get("/:id/download", authenticateToken, (req, res) => {
     const doc = db.prepare("SELECT * FROM documents WHERE id_document = ?").get(id);
     if (!doc) return res.status(404).json({ error: "Document not found" });
 
+    const mimeTypes = {
+      pdf: "application/pdf",
+      jpg: "image/jpeg",
+      jpeg: "image/jpeg",
+      png: "image/png",
+      gif: "image/gif",
+      txt: "text/plain",
+      doc: "application/msword",
+      docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      xls: "application/vnd.ms-excel",
+      xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      ppt: "application/vnd.ms-powerpoint",
+      pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+    };
+
     res.setHeader("Content-Disposition", `attachment; filename="${doc.document_name}.${doc.document_type}"`);
-    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Type", mimeTypes[doc.document_type] || "application/octet-stream");
+
     res.send(doc.document_data);
+    console.log(`Document [${doc.document_name}] is being downloaded...`);
   } catch (error) {
     console.error("Error downloading document:", error);
     res.status(500).json({ error: "Failed to download document" });
   }
 });
 
-// View document
+// View document inline
 router.get("/:id/view", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;
@@ -237,8 +264,10 @@ router.get("/:id/view", authenticateToken, (req, res) => {
     };
 
     res.setHeader("Content-Type", mimeTypes[doc.document_type] || "application/octet-stream");
-    res.setHeader("Content-Disposition", "inline");
+    res.setHeader("Content-Disposition", `inline; filename="${doc.document_name}.${doc.document_type}"`);
+
     res.send(doc.document_data);
+    console.log(`Document [${doc.document_name}] is being viewed inline...`);
   } catch (error) {
     console.error("Error viewing document:", error);
     res.status(500).json({ error: "Failed to view document" });

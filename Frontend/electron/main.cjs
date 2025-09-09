@@ -5,6 +5,8 @@ const isDev = !!process.env.VITE_DEV_SERVER_URL;
 
 function createWindow() {
   const win = new BrowserWindow({
+     title: "Archive DUAC",
+  icon: path.join(__dirname, '../public/LogoWhite.png'),
     width: 1100,
     height: 720,
     webPreferences: {

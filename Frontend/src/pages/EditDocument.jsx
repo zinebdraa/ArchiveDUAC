@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavBare from "../components/NavBare";
@@ -16,7 +16,6 @@ const EditDocument = () => {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const fileInputRef = useRef(null);
 
   const [formValues, setFormValues] = useState({
     document_name: "",
@@ -26,7 +25,7 @@ const EditDocument = () => {
     document: null,
   });
 
-  // Fetch one service details
+  // Fetch one document details
   const fetchDocumentDetails = async () => {
     setLoading(true);
     try {
@@ -39,13 +38,11 @@ const EditDocument = () => {
 
       let svc = response.data;
 
-      if (response.data && response.data.service) {
-        svc = response.data.service;
+      if (response.data && response.data.document) {
+        svc = response.data.document;
       } else if (response.data && response.data.data) {
         svc = response.data.data;
       }
-
-      console.log("Extracted documents:", svc);
 
       if (!svc || (typeof svc === "object" && Object.keys(svc).length === 0)) {
         setDocument(null);
@@ -154,7 +151,7 @@ const EditDocument = () => {
     if (documentId && token) {
       fetchDocumentDetails();
     } else {
-      console.log("Missing serviceId or token:", {
+      console.log("Missing documentId or token:", {
         documentId,
         token: !!token,
       });
@@ -163,7 +160,7 @@ const EditDocument = () => {
 
   if (loading && !document) {
     return (
-      <div className="grid grid-cols-4 min-h-screen">
+      <div className="grid grid-cols-4 h-screen">
         <div className="grid col-span-1">
           <SideBar />
         </div>
@@ -181,7 +178,7 @@ const EditDocument = () => {
 
   if (!document && !loading) {
     return (
-      <div className="grid grid-cols-4 min-h-screen">
+      <div className="grid grid-cols-4 h-screen">
         <div className="grid col-span-1 h-screen">
           <SideBar />
         </div>
@@ -205,7 +202,7 @@ const EditDocument = () => {
     );
   }
   return (
-    <div className="grid grid-cols-4 min-h-screen">
+    <div className="grid grid-cols-4 h-screen">
       <div className="grid col-span-1 h-screen ">
         <SideBar />
       </div>
@@ -224,7 +221,7 @@ const EditDocument = () => {
                 {documentId
                   ? document
                     ? `Détails du document ${
-                        document?.service_name ?? document?.name ?? ""
+                        document?.document_name ?? document?.name ?? ""
                       }`
                     : "Détails du document"
                   : "Détails du document"}
@@ -233,25 +230,21 @@ const EditDocument = () => {
 
             {/* Success/Error Messages */}
             {success && <div className="mb-2  text-green-700 ">{success}</div>}
-            {error && (
-              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                {error}
-              </div>
-            )}
+            {error && <div className="mb-4  text-red-700 ">{error}</div>}
 
-            {/* Service Details Form */}
+            {/* document Details Form */}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div className="flex items-center">
                   <label
-                    htmlFor="service_name"
+                    htmlFor="document_name"
                     className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
                   >
                     Nom :
                   </label>
                   <input
                     type="text"
-                    id="service_name"
+                    id="document_name"
                     value={formValues.document_name}
                     onChange={handleChange}
                     disabled={!isEditing}
@@ -263,14 +256,14 @@ const EditDocument = () => {
 
                 <div className="flex items-center">
                   <label
-                    htmlFor="service_place"
+                    htmlFor="document_place"
                     className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
                   >
                     Archivé dans :
                   </label>
                   <input
                     type="text"
-                    id="service_place"
+                    id="document_place"
                     value={formValues.document_place}
                     onChange={handleChange}
                     disabled={!isEditing}
@@ -310,25 +303,6 @@ const EditDocument = () => {
                     id="sDescription"
                     value={formValues.dDescription}
                     onChange={handleChange}
-                    disabled={!isEditing}
-                    rows="4"
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${
-                      !isEditing ? "bg-gray-100 cursor-not-allowed" : "bg-white"
-                    }`}
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <label
-                    htmlFor="sDescription"
-                    className="block text-sm font-medium text-gray-700 mb-1 w-[150px]"
-                  >
-                    File :
-                  </label>
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={(e) => setDocument(e.target.files[0])}
                     disabled={!isEditing}
                     rows="4"
                     className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-green ${

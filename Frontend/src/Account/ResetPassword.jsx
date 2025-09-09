@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {  useNavigate } from "react-router-dom";
 import axios from "axios";
 import LogoGrey from "../../public/LogoGrey.png";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -109,7 +109,7 @@ const ResetPassword = () => {
       );
 
       if (response.status === 200) {
-        navigate("/Login");
+        navigate("/");
         clearForm();
       }
     } catch (err) {

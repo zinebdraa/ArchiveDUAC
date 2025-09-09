@@ -38,16 +38,8 @@ router.post("/", authenticateToken, (req, res) => {
     const { service_name, service_place, sDescription, sCreatedDate } = req.body;
 
     if (!service_name || !service_place || !sCreatedDate) {
-      return res.status(400).json({ error: "Service name and place are required" });
+      return res.status(400).json({ error: "Service name, place and creation date are required" });
     }
-
-    // // Validate the format 
-    // const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
-    // if (!dateRegex.test(sCreatedDate)) {
-    //   return res.status(400).json({
-    //     error: "Date must be in DD-MM-YYYY format"
-    //   })
-    // }
 
     const insertService = db.prepare(`
       INSERT INTO services (service_name, service_place, sDescription, sCreatedDate)
@@ -73,7 +65,7 @@ router.post("/", authenticateToken, (req, res) => {
   }
 });
 
-// Update service (rename)
+// Update service 
 router.put("/:id", authenticateToken, (req, res) => {
   try {
     const { id } = req.params;

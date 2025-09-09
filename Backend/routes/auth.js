@@ -98,9 +98,9 @@ router.put("/profile", authenticateToken, (req, res) => {
       return res.status(400).json({ error: "Password required for profile updates" });
     }
 
-    // if (!user_name && !user_email && !user_num) {
-    //   return res.status(400).json({ error: "At least one field (username or email or phone) must be provided" });
-    // }
+    if (!user_name && !user_email && !user_num) {
+      return res.status(400).json({ error: "At least one field (username or email or phone) must be provided" });
+    }
 
     const user = db.prepare("SELECT password FROM users WHERE id_user = ?").get(userId);
     if (!user) {

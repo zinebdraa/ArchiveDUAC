@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import NavBare from "../components/NavBare";
@@ -200,7 +200,7 @@ const EditChemise = () => {
     );
   }
   return (
-    <div className="grid grid-cols-4 min-h-screen">
+    <div className="grid grid-cols-4 h-screen">
       <div className="grid col-span-1 h-screen">
         <SideBar />
       </div>
@@ -229,7 +229,7 @@ const EditChemise = () => {
             {/* Success/Error Messages */}
             {success && <div className="mb-2  text-green-700 ">{success}</div>}
             {error && (
-              <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+              <div className="mb-4  text-red-700 ">
                 {error}
               </div>
             )}
