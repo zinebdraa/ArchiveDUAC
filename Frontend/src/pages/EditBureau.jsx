@@ -35,15 +35,11 @@ const EditBureau = () => {
         }
       );
 
-      // Common patterns: response.data, response.data.service, response.data.data
       let svc = response.data;
 
-      // If response.data has a service property, use that
       if (response.data && response.data.service) {
         svc = response.data.service;
-      }
-      // If response.data has a data property, use that
-      else if (response.data && response.data.data) {
+      } else if (response.data && response.data.data) {
         svc = response.data.data;
       }
 
@@ -73,7 +69,6 @@ const EditBureau = () => {
       console.error("Error response:", error.response);
 
       if (error.response) {
-        // Server responded with error status
         if (error.response.status === 404) {
           setError("Service non trouvé.");
         } else {
@@ -84,10 +79,8 @@ const EditBureau = () => {
           );
         }
       } else if (error.request) {
-        // Request was made but no response received
         setError("Impossible de contacter le serveur.");
       } else {
-        // Something else happened
         setError("Erreur lors de la récupération du service.");
       }
     } finally {

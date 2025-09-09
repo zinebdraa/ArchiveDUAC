@@ -15,7 +15,7 @@ const Bureaux = () => {
   const [search, setSearch] = useState("");
   const [service, setService] = useState(null);
 
-  // Helper: normalize service id field on bureau objects
+  //normalize service id field on bureau objects
   const getBureauServiceId = (b) =>
     Number(b?.id_service ?? b?.service_id ?? b?.serviceId ?? b?.service ?? NaN);
 
@@ -80,7 +80,6 @@ const Bureaux = () => {
     }
   };
 
-  // Initial + on service change
   useEffect(() => {
     fetchBureaux();
     fetchService();

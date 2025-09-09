@@ -62,14 +62,12 @@ const EditService = () => {
         sDescription: svc.sDescription || "",
       });
 
-      // Clear any previous errors
       setError("");
     } catch (error) {
       console.error("Error fetching service details:", error);
       console.error("Error response:", error.response);
 
       if (error.response) {
-        // Server responded with error status
         if (error.response.status === 404) {
           setError("Service non trouvé.");
         } else {
@@ -80,10 +78,8 @@ const EditService = () => {
           );
         }
       } else if (error.request) {
-        // Request was made but no response received
         setError("Impossible de contacter le serveur.");
       } else {
-        // Something else happened
         setError("Erreur lors de la récupération du service.");
       }
     } finally {

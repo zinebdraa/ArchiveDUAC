@@ -375,22 +375,26 @@ import pptx from "../assets/pptx.svg";
 const PreviewModal = ({ document, onClose }) => {
   if (!document) return null;
 
+  console.log("Previewing document:", document);
+
   // Function to handle download
   const handleDownload = () => {
-    // Assuming document.document_url contains the file path
-    window.open(document.document_url, '_blank');
+    // Assuming document.document_data contains the file path
+    window.open(document.document_data, "_blank");
   };
 
   const renderPreview = () => {
     const fileType = document.document_type?.toLowerCase();
-    const fileUrl = document.document_url;
+    const fileUrl = document.document_data;
+
+    console.log(`File type: ${fileType}, URL: ${fileUrl}`);
 
     switch (fileType) {
       case "pdf":
         return (
-          <iframe 
-            src={fileUrl} 
-            className="w-full h-full" 
+          <iframe
+            src={fileUrl}
+            className="w-full h-full"
             title={document.document_name}
           />
         );
@@ -400,8 +404,8 @@ const PreviewModal = ({ document, onClose }) => {
       case "gif":
       case "bmp":
         return (
-          <img 
-            src={fileUrl} 
+          <img
+            src={fileUrl}
             alt={document.document_name}
             className="max-w-full max-h-full object-contain"
           />
@@ -420,11 +424,11 @@ const PreviewModal = ({ document, onClose }) => {
             <div className="text-center mb-6">
               <p className="text-lg font-medium mb-2">Preview not available</p>
               <p className="text-gray-600">
-                This file type cannot be previewed in the browser. 
-                Please download the file to view it.
+                This file type cannot be previewed in the browser. Please
+                download the file to view it.
               </p>
             </div>
-            <button 
+            <button
               onClick={handleDownload}
               className="px-6 py-2 bg-primary-green text-white rounded-lg hover:bg-secondary-green flex items-center gap-2"
             >
@@ -441,16 +445,14 @@ const PreviewModal = ({ document, onClose }) => {
       <div className="bg-white rounded-lg w-4/5 h-4/5 flex flex-col">
         <div className="flex justify-between items-center p-4 border-b">
           <h3 className="text-lg font-semibold">{document.document_name}</h3>
-          <button 
+          <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100"
           >
             <IoClose className="w-6 h-6" />
           </button>
         </div>
-        <div className="flex-1 p-4 overflow-auto">
-          {renderPreview()}
-        </div>
+        <div className="flex-1 p-4 overflow-auto">{renderPreview()}</div>
       </div>
     </div>
   );
@@ -458,9 +460,9 @@ const PreviewModal = ({ document, onClose }) => {
 
 // Component to fetch and display text files
 const TextFileViewer = ({ fileUrl }) => {
-  const [content, setContent] = useState('');
+  const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchTextFile = async () => {
@@ -470,7 +472,8 @@ const TextFileViewer = ({ fileUrl }) => {
         setContent(text);
         setLoading(false);
       } catch (err) {
-        setError('Failed to load text file');
+        console.error("Update error:", err);
+        setError("Failed to load text file");
         setLoading(false);
       }
     };
@@ -479,7 +482,8 @@ const TextFileViewer = ({ fileUrl }) => {
   }, [fileUrl]);
 
   if (loading) return <div className="text-center py-8">Loading...</div>;
-  if (error) return <div className="text-center py-8 text-red-500">{error}</div>;
+  if (error)
+    return <div className="text-center py-8 text-red-500">{error}</div>;
 
   return (
     <pre className="whitespace-pre-wrap font-sans bg-white p-4 rounded border">
@@ -704,6 +708,23 @@ const Document = () => {
       : "Chargement..."
     : "Tous les documents";
 
+
+  // Function to handle download
+  const handleDownload = (doc) => {
+    if (!doc?.document_data) {
+      alert("No file available to download.");
+      return;
+    }
+
+    // Create a temporary link element
+    const link = document.createElement("a");
+    link.href = doc.document_data;
+    link.download = doc.document_name || "document";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="grid grid-cols-4 h-screen">
       <div className="col-span-1 h-screen">
@@ -796,13 +817,16 @@ const Document = () => {
                     <div>{document.bureau_name}</div>
                     <div>{document.dCreatedDate}</div>
                     <div className="flex justify-center space-x-2">
-                      <HiOutlineDownload className="size-[20px] cursor-pointer" />
+                      <HiOutlineDownload
+                        className="size-[20px] cursor-pointer"
+                        onClick={() => handleDownload(document)}
+                      />
                       <Link to={`/editDocument/${document.id_document}`}>
                         <MdEdit className="size-[20px] cursor-pointer" />
                       </Link>
 
-                      <IoEye 
-                        className="size-[20px] cursor-pointer" 
+                      <IoEye
+                        className="size-[20px] cursor-pointer"
                         onClick={() => handlePreview(document)}
                       />
                       <TbTrashX
@@ -824,9 +848,9 @@ const Document = () => {
 
       {/* Preview Modal */}
       {previewDocument && (
-        <PreviewModal 
-          document={previewDocument} 
-          onClose={() => setPreviewDocument(null)} 
+        <PreviewModal
+          document={previewDocument}
+          onClose={() => setPreviewDocument(null)}
         />
       )}
     </div>

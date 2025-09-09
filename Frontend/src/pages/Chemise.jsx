@@ -814,6 +814,8 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import NavBare from "../components/NavBare";
 import SideBar from "../components/SideBar";
 import axios from "axios";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 import { IoIosAdd } from "react-icons/io";
 import { FaCheckCircle } from "react-icons/fa";
@@ -994,6 +996,167 @@ const Chemise = () => {
       : "Chargement..."
     : "Toutes les chemises";
 
+  // Download all documents of a chemise as ZIP
+  // const handleDownloadChemise = async (chemise) => {
+  //   try {
+  //     const { data: allDocs } = await axios.get(
+  //       "http://localhost:3001/api/documents",
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     console.log("Chemise id:", chemise.id_chemise);
+  //     console.log("All documents:", allDocs);
+
+  //     const docs = allDocs.filter(
+  //       (d) =>
+  //         Number(d.chemise_id ?? d.id_chemise ?? d.chemiseId) ===
+  //         chemise.id_chemise
+  //     );
+
+  //     if (docs.length === 0) {
+  //       alert("Cette chemise ne contient aucun document.");
+  //       return;
+  //     }
+
+  //     const zip = new JSZip();
+
+  //     await Promise.all(
+  //       docs.map(async (doc) => {
+  //         try {
+  //           const response = await fetch(doc.document_data, {
+  //             headers: { Authorization: `Bearer ${token}` },
+  //           });
+  //           const blob = await response.blob();
+  //           const ext = doc.document_type || "";
+  //           const filename = doc.document_name || `document.${ext}`;
+  //           zip.file(filename, blob);
+  //         } catch (err) {
+  //           console.error("Erreur de téléchargement:", doc.document_name, err);
+  //         }
+  //       })
+  //     );
+
+  //     const content = await zip.generateAsync({ type: "blob" });
+  //     saveAs(content, `${chemise.chemise_name || "chemise"}.zip`);
+  //   } catch (err) {
+  //     console.error("Erreur lors du téléchargement de la chemise:", err);
+  //     alert("Impossible de télécharger cette chemise.");
+  //   }
+  // };
+
+  const handleDownloadChemise = async (chemise) => {
+    try {
+      const { data: allDocs } = await axios.get(
+        "http://localhost:3001/api/documents",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // filter docs by chemise_name
+      const docs = allDocs.filter(
+        (d) => d.chemise_name === chemise.chemise_name
+      );
+
+      console.log("Chemise:", chemise.chemise_name);
+      console.log("Documents found:", docs);
+
+      if (docs.length === 0) {
+        alert("Cette chemise ne contient aucun document.");
+        return;
+      }
+
+      const zip = new JSZip();
+      for (const doc of docs) {
+        // here you'd normally fetch the file binary (e.g. axios.get with responseType: "blob")
+        // but since you only have document_name/place now, we’ll just add a placeholder
+        zip.file(
+          `${doc.document_name}.txt`,
+          `Placeholder for ${doc.document_name}`
+        );
+      }
+//       for (const doc of docs) {
+// const folder = zip.folder(chemise.chemise_name);
+
+//   try {
+//     const response = await axios.get(
+//       `http://localhost:3001/api/documents/${doc.id_document}/download`,
+//       {
+//         headers: { Authorization: `Bearer ${token}` },
+//         responseType: "blob", // this is key!
+//       }
+//     );
+
+//     // Use the original document type/extension
+//     const extension = doc.document_type || "txt";
+
+//     // Add the real file to the zip
+//     folder.file(`${doc.document_name}.${extension}`, response.data);
+//   } catch (err) {
+//     console.error(`Error downloading file ${doc.document_name}:`, err);
+//     // fallback: still include a note
+//     folder.file(
+//       `${doc.document_name}_ERROR.txt`,
+//       `Impossible de télécharger ${doc.document_name}`
+//     );
+//   }
+// }
+
+
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, `${chemise.chemise_name}.zip`);
+    } catch (err) {
+      console.error("Error downloading chemise:", err);
+      alert("Erreur lors du téléchargement de la chemise.");
+    }
+  };
+
+  const handleBulkDownload = async () => {
+    if (selected.length === 0) {
+      alert("Aucune chemise sélectionnée.");
+      return;
+    }
+
+    try {
+      const { data: allDocs } = await axios.get(
+        "http://localhost:3001/api/documents",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      const zip = new JSZip();
+
+      // Loop over each selected chemise
+      for (const chemiseId of selected) {
+        const chemise = results.find((c) => c.id_chemise === chemiseId);
+        if (!chemise) continue;
+
+        // Filter documents for this chemise
+        const docs = allDocs.filter(
+          (d) => d.chemise_name === chemise.chemise_name
+        );
+
+        if (docs.length === 0) continue;
+
+        // Create a folder inside the zip for this chemise
+        const folder = zip.folder(chemise.chemise_name);
+
+        for (const doc of docs) {
+          // Placeholder file (replace with actual file content later)
+          folder.file(
+            `${doc.document_name}.txt`,
+            `Placeholder for ${doc.document_name}`
+          );
+        }
+      }
+
+      const content = await zip.generateAsync({ type: "blob" });
+      saveAs(content, `chemises_selectionnees.zip`);
+    } catch (err) {
+      console.error("Error bulk downloading chemises:", err);
+      alert("Erreur lors du téléchargement des chemises.");
+    }
+  };
+
   return (
     <div className="grid grid-cols-4 h-screen">
       <div className="col-span-1 h-screen">
@@ -1032,7 +1195,15 @@ const Chemise = () => {
                   <FaCheckCircle className="mr-2 size-[20px]" />
                   {selected.length > 0 && `(${selected.length})`} sélectionné
                 </li>
-                <li className="flex items-center px-3 py-1 rounded-lg hover:bg-secondary-green cursor-pointer">
+
+                <li
+                  className={`flex items-center px-3 py-1 rounded-lg cursor-pointer ${
+                    selected.length > 0
+                      ? "hover:bg-green-3 bg-secondary-green text-white"
+                      : "hover:bg-secondary-green opacity-50"
+                  }`}
+                  onClick={handleBulkDownload}
+                >
                   <HiOutlineDownload className="mr-2 size-[25px]" />
                   Télécharger
                 </li>
@@ -1094,8 +1265,14 @@ const Chemise = () => {
                     <div>
                       {new Date(chemise.cCreatedDate).toLocaleDateString()}
                     </div>
-                    <div className="flex justify-center space-x-2" onClick={(e) => e.stopPropagation()}>
-                      <HiOutlineDownload className="size-[20px] cursor-pointer hover:text-blue-600" />
+                    <div
+                      className="flex justify-center space-x-2"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <HiOutlineDownload
+                        className="size-[20px] cursor-pointer hover:text-blue-600"
+                        onClick={() => handleDownloadChemise(chemise)}
+                      />
                       <Link to={`/editChemise/${chemise.id_chemise}`}>
                         <MdEdit className="size-[20px] cursor-pointer hover:text-green-600" />
                       </Link>

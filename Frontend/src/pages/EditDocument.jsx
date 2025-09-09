@@ -47,7 +47,6 @@ const EditDocument = () => {
 
       console.log("Extracted documents:", svc);
 
-      // Check if service exists and has expected properties
       if (!svc || (typeof svc === "object" && Object.keys(svc).length === 0)) {
         setDocument(null);
         setError("document non trouvé.");
@@ -56,7 +55,6 @@ const EditDocument = () => {
 
       setDocument(svc);
 
-      // Populate form with current service data
       setFormValues({
         document_name: svc.document_name || "",
         document_place: svc.document_place || "",
@@ -64,14 +62,12 @@ const EditDocument = () => {
         dDescription: svc.dDescription || "",
       });
 
-      // Clear any previous errors
       setError("");
     } catch (error) {
       console.error("Error fetching document details:", error);
       console.error("Error response:", error.response);
 
       if (error.response) {
-        // Server responded with error status
         if (error.response.status === 404) {
           setError("Document non trouvé.");
         } else {
@@ -82,10 +78,8 @@ const EditDocument = () => {
           );
         }
       } else if (error.request) {
-        // Request was made but no response received
         setError("Impossible de contacter le serveur.");
       } else {
-        // Something else happened
         setError("Erreur lors de la récupération du document.");
       }
     } finally {
@@ -334,7 +328,6 @@ const EditDocument = () => {
                   <input
                     type="file"
                     ref={fileInputRef}
-                    
                     onChange={(e) => setDocument(e.target.files[0])}
                     disabled={!isEditing}
                     rows="4"

@@ -243,7 +243,7 @@ const AddDoc = () => {
               value={selectedService}
               onChange={(s) => {
                 setSelectedService(s);
-                setErrSelectedService(""); // clear error on select
+                setErrSelectedService(""); 
                 setSelectedBureau(null);
                 setSelectedChemise(null);
               }}
@@ -327,7 +327,7 @@ const AddDoc = () => {
                 value={selectedBureau}
                 onChange={(b) => {
                   setSelectedBureau(b);
-                  setErrSelectedBureau(""); // clear error on select
+                  setErrSelectedBureau("");
                   setSelectedChemise(null);
                 }}
               >
@@ -574,13 +574,6 @@ const AddDoc = () => {
           <label htmlFor="description" className="font-medium mr-10">
             Le fichier <span className="text-red-500">*</span>:
           </label>
-          {/* <input
-            type="file"
-            id="file-input"
-            placeholder="Veuillez entrer le document"
-            onChange={(e) => setFile(e.target.files[0])}
-            className="border border-gray-300 rounded p-2 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-primary-green"
-          /> */}
           <input
             type="file"
             ref={fileInputRef}

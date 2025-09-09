@@ -34,7 +34,6 @@ function Login() {
         {
           headers: {
             "Content-Type": "application/json",
-            
           },
         }
       );
@@ -42,12 +41,11 @@ function Login() {
       if (response.status === 200) {
         localStorage.setItem("token", response.data.token);
         navigate("/services");
-        clearForm()
+        clearForm();
       }
     } catch (err) {
       console.error("Login error:", err);
 
-      // Handle different error scenarios
       if (err.response?.status === 401) {
         setErrPassword("Mot de passe incorrect");
       } else if (err.response?.status >= 500) {

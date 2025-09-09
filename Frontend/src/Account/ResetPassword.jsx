@@ -115,7 +115,6 @@ const ResetPassword = () => {
     } catch (err) {
       console.error("Login error:", err);
 
-      // Handle different error scenarios
       if (err.response?.status === 401) {
         setErr("Mot de passe incorrect");
       } else if (err.response?.status >= 500) {

@@ -467,7 +467,6 @@ const Parametre = () => {
             </div>
           );
         } else {
-          // Select specific item to delete
           const items = deleteStep === "service" ? services : bureaus;
           const itemType = deleteStep === "service" ? "service" : "bureau";
 
