@@ -23,20 +23,10 @@
     "files": [
       "dist/**/*",
       "electron/**/*",
-      "package.json"
+      "package.json",
+      "backend-modules/**/*",
+      "database.sqlite"
     ],
-
-    "extraResources": [
-      {
-        "from": "../Backend",
-        "to": "server",
-        "filter": [
-          "**/*",
-          "!node_modules/**/*"
-        ]
-      }
-    ],
-
     "directories": {
       "output": "dist",
       "buildResources": "build"
