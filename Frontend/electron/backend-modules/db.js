@@ -1,6 +1,37 @@
 const Database = require("better-sqlite3");
+const fs = require("fs");
+const path = require("path");
+const { app } = require("electron");
 
-const db = new Database("./database.sqlite");
+let dbPath ;
+
+
+
+
+// If running inside Electron (packaged app)
+if (app && app.getPath) {
+  const userDataPath = app.getPath("userData");
+  dbPath = path.join(userDataPath, "database.sqlite");
+
+   if (!fs.existsSync(dbPath)) {
+    const packagedDbPath = path.join(process.resourcesPath, "database.sqlite");
+    if (fs.existsSync(packagedDbPath)) {
+      fs.copyFileSync(packagedDbPath, dbPath);
+      console.log("Copied pre-filled database to userData folder.");
+    }else {
+      console.warn("[db] No packaged DB found, empty DB will be created.");
+    }
+  }else {
+    console.log("[db] Using existing DB in userData.");
+  }
+} else {
+  // Fallback for dev mode
+  dbPath = path.join(__dirname, "../database.sqlite");
+}
+
+const db = new Database(dbPath);
+
+db.pragma('foreign_keys = ON');
 
 // create tables
 const createTables = db.transaction(() => {
